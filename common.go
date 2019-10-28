@@ -3,6 +3,7 @@ package sensor
 import (
 	"bytes"
 	"encoding/binary"
+	"gopkg.in/mgo.v2/bson"
 )
 
 /**
@@ -36,3 +37,13 @@ func BytesToIntU(b []byte) (uint16, error) {
 	err := binary.Read(bytesBuffer, binary.BigEndian, &tmp)
 	return tmp, err
 }
+
+func ComposeBody(DeviceAddr, FuncCode, Data []byte) {
+
+}
+
+
+func GetDeviceInfo(id bson.ObjectId) {
+
+}
+

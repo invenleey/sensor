@@ -14,3 +14,10 @@ func TestCheckCRC(t *testing.T) {
 		fmt.Println("no match")
 	}
 }
+
+// little
+func TestCreateCRC(t *testing.T) {
+	dat := []byte{0x06, 0x03, 0x00, 0x00, 0x00, 0x04}
+	r := CalCRC(dat)
+	print(r)
+}

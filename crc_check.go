@@ -63,13 +63,20 @@ func CheckSum(data []byte) uint16 {
  * @return true if it is match
  */
 func ValidateCRC(target, pattern []byte) bool {
-	checksum := CheckSum(target)
-	bk, _ := BytesToIntU(pattern)
+	t := CheckSum(target)
+	p, _ := BytesToIntU(pattern)
 	// the target value is match to the match fields
-	if bk == checksum {
+	if p == t {
 		return true
 	}
 	//fmt.Printf("big:%X", ToBigEndian(checksum))
 	//fmt.Printf("little:%X", ToLittleEndian(checksum))
 	return false
+}
+
+/**
+ * return a littleendian crc value
+ */
+func CalCRC(src []byte) []byte {
+	return ToLittleEndian(CheckSum(src))
 }

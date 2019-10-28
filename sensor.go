@@ -1,5 +1,9 @@
 package sensor
 
+import (
+	"gopkg.in/mgo.v2/bson"
+)
+
 type DeviceOperation interface {
 	// 出厂设置
 	RestoreFactory()
@@ -29,6 +33,7 @@ type Sensor struct {
 	VID string
 }
 
+
 func (i Sensor) RestoreFactory() {
 	panic("implement me")
 }
@@ -56,3 +61,23 @@ func (i Sensor) GetMeasuredValue() {
 func (i Sensor) SetDefault() {
 	panic("implement me")
 }
+
+
+// 写入设备
+func Write(Data []byte, callback func(meta interface{}, data []byte))  {
+	
+}
+
+// 读取设备
+func Read(Data []byte, callback func(meta interface{}, data []byte)) {
+	
+}
+
+func WriteRequest(id bson.ObjectId, funcCode []byte, callback func(meta interface{}, data []byte))  {
+	
+}
+
+func ReadRequest(id bson.ObjectId, funcCode []byte, callback func(meta interface{}, data []byte))  {
+	
+}
+
