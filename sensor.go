@@ -1,6 +1,7 @@
 package sensor
 
 import (
+	"dev.atomtree.cn/atom/da"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -61,6 +62,10 @@ func (i Sensor) SetDefault() {
 	panic("implement me")
 }
 
+/**
+ * measure and config use a same func because they have the third dat which is similar parameter
+ */
+
 // Measure(read)
 func Measure(Data []byte, callback func(meta interface{}, data []byte)) {
 
@@ -86,3 +91,43 @@ func AddDevice(id bson.ObjectId) {
 func RemoteDevice(id bson.ObjectId) {
 
 }
+
+/**
+ * this is the iot device struct in database
+ */
+type IOT struct {
+	ID       bson.ObjectId `json:"id" bson:"_id" title:"id"`
+	IP       string        `json:"ip" bson:"ip" title:"ip"`
+	Pool     bson.ObjectId `json:"pool" bson:"pool" title:"鱼池标识"`
+	Number   string        `json:"number" bson:"number" title:"设备编号"`
+	Name     string        `json:"name" bson:"name" title:"设备名称"`
+	Status   string        `json:"status" bson:"status" title:"在线状态"`
+	Detail   string        `json:"detail" bson:"detail" title:"设备详细"`
+	Operator string        `json:"operator" bson:"operator" title:"操作员"`
+}
+
+/**
+ * firstly using ip to identify whether this device is store in database
+ * if not, create it on da
+ */
+func GetDeviceByIP(ip string) (IOT, error) {
+	s, db, err := da.ConnectDefault()
+	if err != nil {
+		return IOT{}, nil
+	}
+	defer s.Close()
+
+	iotColl := db.C("EventTable")
+	iotQuery := bson.M{"ip": ip}
+
+	var iotResult []IOT
+
+	if err = iotColl.Find(iotQuery).Skip(0).Limit(0).Sort().All(&iotResult); err != nil {
+		return IOT{}, err
+	}
+	if len(iotResult) == 0{
+		da.save()
+	}
+	return iotResult, nil
+}
+

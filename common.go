@@ -3,6 +3,7 @@ package sensor
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -49,10 +50,33 @@ func ComposeBody(DeviceAddr, FuncCode, Data []byte) []byte {
 }
 
 /**
- * separate command parameters
+ * separate config command parameters
+ * @params src is a measure respond data
+ * @return DeviceAddr and FuncCode
+ * @return RegisterAddr
+ * @return ConfigData
+ * @return error it will also use crc-16 to validate whether it got a true data, if not returns error(wrong data)
  */
-func SplitBody() []byte {
-	return nil
+func SplitConfig(src []byte) ([]byte, []byte, []byte, error) {
+	if ValidateCRC(src[:6], src[6:8]) {
+		return src[:2], src[2:4], src[4:6], nil
+	}
+	return nil, nil, nil, errors.New("got error data")
+}
+
+/**
+ * separate measure command parameters
+ * @params src is a measure respond data
+ * @return DeviceAddr and FuncCode
+ * @return ByteCount
+ * @return MeasureData
+ */
+func SplitMeasure(src []byte) ([]byte, []byte, error) {
+	ByteCount := src[2] + 3
+	if ValidateCRC(src[:ByteCount], src[ByteCount:ByteCount+2]) {
+		return src[:2], src[3:ByteCount], nil
+	}
+	return nil, nil, errors.New("got error data")
 }
 
 /**

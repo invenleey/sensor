@@ -64,7 +64,8 @@ func CheckSum(data []byte) uint16 {
  */
 func ValidateCRC(target, pattern []byte) bool {
 	t := CheckSum(target)
-	p, _ := BytesToIntU(pattern)
+	pl := append(pattern[1:], pattern[:1]...)
+	p, _ := BytesToIntU(pl)
 	// the target value is match to the match fields
 	if p == t {
 		return true
