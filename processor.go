@@ -105,6 +105,9 @@ func readConn(conn net.Conn, readChan chan<- []byte, stopChan chan<- bool) {
 	stopChan <- true
 }
 func writeConn(conn net.Conn, writeChan <-chan []byte, stopChan chan<- bool) {
+	// test
+	k := []byte{0x06, 0x03, 0x00, 0x00, 0x00, 0x04, 0x45, 0xBE}
+	_, _ = conn.Write(k)
 	for {
 		strData := <-writeChan
 		_, err := conn.Write(strData)
@@ -117,8 +120,8 @@ func writeConn(conn net.Conn, writeChan <-chan []byte, stopChan chan<- bool) {
 	stopChan <- true
 }
 
-// 心跳计时，根据GravelChannel判断Client是否在设定时间内发来信息
-func HeartBeating(conn net.Conn, readerChannel chan []byte,timeout int) {
+// 心跳检测，根据GravelChannel判断Client是否在设定时间内发来信息
+func HeartBeating(conn net.Conn, readerChannel chan []byte, timeout int) {
 	select {
 	case _ = <-readerChannel:
 		print(conn.RemoteAddr().String(), "get message, keeping heartbeating...")

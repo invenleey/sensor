@@ -1,7 +1,6 @@
 package sensor
 
 import (
-	"dev.atomtree.cn/atom/da"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -101,6 +100,7 @@ type IOT struct {
 	Pool     bson.ObjectId `json:"pool" bson:"pool" title:"鱼池标识"`
 	Number   string        `json:"number" bson:"number" title:"设备编号"`
 	Name     string        `json:"name" bson:"name" title:"设备名称"`
+	Type     string        `json:"type" bson:"type" title:"设备类型"`
 	Status   string        `json:"status" bson:"status" title:"在线状态"`
 	Detail   string        `json:"detail" bson:"detail" title:"设备详细"`
 	Operator string        `json:"operator" bson:"operator" title:"操作员"`
@@ -110,24 +110,24 @@ type IOT struct {
  * firstly using ip to identify whether this device is store in database
  * if not, create it on da
  */
-func GetDeviceByIP(ip string) (IOT, error) {
-	s, db, err := da.ConnectDefault()
-	if err != nil {
-		return IOT{}, nil
-	}
-	defer s.Close()
-
-	iotColl := db.C("EventTable")
-	iotQuery := bson.M{"ip": ip}
-
-	var iotResult []IOT
-
-	if err = iotColl.Find(iotQuery).Skip(0).Limit(0).Sort().All(&iotResult); err != nil {
-		return IOT{}, err
-	}
-	if len(iotResult) == 0{
-		da.save()
-	}
-	return iotResult, nil
-}
-
+//func GetDeviceByIP(ip string) (IOT, error) {
+//	s, db, err := da.ConnectDefault()
+//	if err != nil {
+//		return IOT{}, nil
+//	}
+//	defer s.Close()
+//
+//	iotColl := db.C("EventTable")
+//	iotQuery := bson.M{"ip": ip}
+//
+//	var iotResult []IOT
+//
+//	if err = iotColl.Find(iotQuery).Skip(0).Limit(0).Sort().All(&iotResult); err != nil {
+//		return IOT{}, err
+//	}
+//	if len(iotResult) == 0{
+//		da.save()
+//	}
+//	return iotResult, nil
+//}
+//
