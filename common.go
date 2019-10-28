@@ -38,12 +38,26 @@ func BytesToIntU(b []byte) (uint16, error) {
 	return tmp, err
 }
 
-func ComposeBody(DeviceAddr, FuncCode, Data []byte) {
-
+/**
+ * generate a default request command
+ */
+func ComposeBody(DeviceAddr, FuncCode, Data []byte) []byte {
+	ret := append(DeviceAddr, FuncCode...)
+	ret = append(ret, Data...)
+	ret = append(ret, CreateCRC(ret)...)
+	return ret
 }
 
+/**
+ * separate command parameters
+ */
+func SplitBody() []byte {
+	return nil
+}
 
+/**
+ * get device information from database
+ */
 func GetDeviceInfo(id bson.ObjectId) {
 
 }
-

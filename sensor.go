@@ -33,7 +33,6 @@ type Sensor struct {
 	VID string
 }
 
-
 func (i Sensor) RestoreFactory() {
 	panic("implement me")
 }
@@ -62,22 +61,28 @@ func (i Sensor) SetDefault() {
 	panic("implement me")
 }
 
+// Measure(read)
+func Measure(Data []byte, callback func(meta interface{}, data []byte)) {
 
-// 写入设备
-func Write(Data []byte, callback func(meta interface{}, data []byte))  {
-	
 }
 
-// 读取设备
-func Read(Data []byte, callback func(meta interface{}, data []byte)) {
-	
+// Config(write)
+func Config(Data []byte, callback func(meta interface{}, data []byte)) {
+
 }
 
-func WriteRequest(id bson.ObjectId, funcCode []byte, callback func(meta interface{}, data []byte))  {
-	
+func MeasureRequest(id bson.ObjectId, funcCode []byte, callback func(meta interface{}, data []byte)) {
+
 }
 
-func ReadRequest(id bson.ObjectId, funcCode []byte, callback func(meta interface{}, data []byte))  {
-	
+func ConfigRequest(id bson.ObjectId, funcCode []byte, callback func(meta interface{}, data []byte)) {
+
 }
 
+func AddDevice(id bson.ObjectId) {
+
+}
+
+func RemoteDevice(id bson.ObjectId) {
+
+}

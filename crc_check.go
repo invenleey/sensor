@@ -69,14 +69,13 @@ func ValidateCRC(target, pattern []byte) bool {
 	if p == t {
 		return true
 	}
-	//fmt.Printf("big:%X", ToBigEndian(checksum))
-	//fmt.Printf("little:%X", ToLittleEndian(checksum))
 	return false
 }
 
 /**
- * return a littleendian crc value
+ * return a string of CRC cyclic verification codes represented by the littleEnd
+ * @return CRC-16 littleEnd byte array
  */
-func CalCRC(src []byte) []byte {
+func CreateCRC(src []byte) []byte {
 	return ToLittleEndian(CheckSum(src))
 }

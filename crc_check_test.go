@@ -18,6 +18,6 @@ func TestCheckCRC(t *testing.T) {
 // little
 func TestCreateCRC(t *testing.T) {
 	dat := []byte{0x06, 0x03, 0x00, 0x00, 0x00, 0x04}
-	r := CalCRC(dat)
+	r := CreateCRC(dat)
 	print(r)
 }
