@@ -35,7 +35,6 @@ func HandleProcessor(conn net.Conn) {
 	go readConn(conn, b.readChan, b.stopChan)
 	go writeConn(conn, b.writeChan, b.stopChan)
 	// go HeartBeating(conn, readChan, 20)
-	_ = SendBytes(conn.RemoteAddr().String(), []byte{0x01})
 	for {
 		select {
 		case readStr := <-b.readChan:

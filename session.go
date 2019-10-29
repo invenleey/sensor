@@ -7,7 +7,6 @@ type DeviceSession struct {
 	writeChan chan []byte
 	stopChan  chan bool
 	conn net.Conn
-	callback func()
 }
 
 var SessionCollection map[string]DeviceSession
@@ -37,5 +36,11 @@ func RegDevice(conn net.Conn) DeviceSession {
  */
 func SendBytes(addr string, b []byte) error {
 	SessionCollection[addr].writeChan <- b
+	return nil
+}
+
+func Send(addr string, b []byte, callback func()) error {
+	SessionCollection[addr].writeChan <- b
+	print("send inner")
 	return nil
 }
