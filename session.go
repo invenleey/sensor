@@ -12,10 +12,16 @@ type DeviceSession struct {
 
 var SessionCollection map[string]DeviceSession
 
-func SessionInit() {
+/**
+ * sessions init
+ */
+func SessionsInit() {
 	SessionCollection = make(map[string]DeviceSession)
 }
 
+/**
+ * reg device to map
+ */
 func RegDevice(conn net.Conn) DeviceSession {
 	var s DeviceSession
 	s.readChan = make(chan []byte)
@@ -23,4 +29,13 @@ func RegDevice(conn net.Conn) DeviceSession {
 	s.stopChan = make(chan bool)
 	SessionCollection[conn.RemoteAddr().String()] = s
 	return s
+}
+
+/**
+ * send bytes to device
+ * this Device must reg info last send message
+ */
+func SendBytes(addr string, b []byte) error {
+	SessionCollection[addr].writeChan <- b
+	return nil
 }

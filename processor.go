@@ -27,7 +27,7 @@ var WRegFactory = []byte{0x20, 0x20}
 var request []byte
 
 func HandleProcessor(conn net.Conn) {
-	fmt.Println(conn.RemoteAddr(), "已经连接")
+	fmt.Println("[连接]", conn.RemoteAddr())
 	defer conn.Close()
 	// session
 	b := RegDevice(conn)
@@ -35,6 +35,7 @@ func HandleProcessor(conn net.Conn) {
 	go readConn(conn, b.readChan, b.stopChan)
 	go writeConn(conn, b.writeChan, b.stopChan)
 	// go HeartBeating(conn, readChan, 20)
+	_ = SendBytes(conn.RemoteAddr().String(), []byte{0x01})
 	for {
 		select {
 		case readStr := <-b.readChan:
@@ -44,7 +45,7 @@ func HandleProcessor(conn net.Conn) {
 		case stop := <-b.stopChan:
 			// 弹出
 			if stop {
-				fmt.Println(conn.RemoteAddr(), "已经断开连接")
+				fmt.Println("[断开]", conn.RemoteAddr())
 				break
 			}
 		}
@@ -52,34 +53,26 @@ func HandleProcessor(conn net.Conn) {
 }
 
 func getData(msg []byte) {
-	fmt.Println("某一协程从服务器接收到: ", msg)
+	fmt.Println("Got: ", msg)
 }
 
 func readConn(conn net.Conn, readChan chan<- []byte, stopChan chan<- bool) {
 	for {
 		data := make([]byte, 20, 20)
-		_, err := conn.Read(data)
-		if err != nil {
-			fmt.Println(err)
+		if _, err := conn.Read(data); err != nil {
 			break
 		}
-		fmt.Println("Received:", data)
 		readChan <- data
 	}
 	stopChan <- true
 }
+
 func writeConn(conn net.Conn, writeChan <-chan []byte, stopChan chan<- bool) {
-	// test
-	k := []byte{0x06, 0x03, 0x00, 0x00, 0x00, 0x04, 0x45, 0xBE}
-	_, _ = conn.Write(k)
 	for {
-		strData := <-writeChan
-		_, err := conn.Write(strData)
-		if err != nil {
-			fmt.Println(err)
+		data := <-writeChan
+		if _, err := conn.Write(data); err != nil {
 			break
 		}
-		fmt.Println("Send:", strData)
 	}
 	stopChan <- true
 }
@@ -88,7 +81,7 @@ func writeConn(conn net.Conn, writeChan <-chan []byte, stopChan chan<- bool) {
 func HeartBeating(conn net.Conn, readerChannel chan []byte, timeout int) {
 	select {
 	case _ = <-readerChannel:
-		print(conn.RemoteAddr().String(), "get message, keeping heartbeating...")
+		print(conn.RemoteAddr().String(), "keeping now")
 		_ = conn.SetDeadline(time.Now().Add(time.Duration(timeout) * time.Second))
 		break
 	}
