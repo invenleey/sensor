@@ -1,6 +1,8 @@
 package sensor
 
-import "net"
+import (
+	"net"
+)
 
 type DeviceSession struct {
 	readChan  chan []byte
@@ -9,6 +11,11 @@ type DeviceSession struct {
 	conn net.Conn
 }
 
+type (
+	Ses interface {
+		GetDeviceData(d []byte)
+	}
+)
 var SessionCollection map[string]DeviceSession
 
 /**
@@ -39,8 +46,3 @@ func SendBytes(addr string, b []byte) error {
 	return nil
 }
 
-func Send(addr string, b []byte, callback func()) error {
-	SessionCollection[addr].writeChan <- b
-	print("send inner")
-	return nil
-}

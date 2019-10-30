@@ -6,25 +6,9 @@ import (
 	"time"
 )
 
-// Function Code Type
-// Read 0x03
-// Write 0x06
-var ReadFunc = []byte{0x03}
-var WriteFunc = []byte{0x06}
 
-// Register Address
-var RRegMeasure = []byte{0x00, 0x00}
-var WRegOxygen = []byte{0x10, 0x04}
-var WRegZero = []byte{010, 0x00}
-var WRegTilt = []byte{0x10, 0x04}
 
-var RRegZero = []byte{010, 0x06}
-var RRegTilt = []byte{0x10, 0x08}
 
-var ARegAddr = []byte{0x20, 0x02}
-var WRegFactory = []byte{0x20, 0x20}
-
-var request []byte
 
 func HandleProcessor(conn net.Conn) {
 	fmt.Println("[连接]", conn.RemoteAddr())
@@ -35,12 +19,17 @@ func HandleProcessor(conn net.Conn) {
 	go readConn(conn, b.readChan, b.stopChan)
 	go writeConn(conn, b.writeChan, b.stopChan)
 	// go HeartBeating(conn, readChan, 20)
+
+	// testing
+	go SendWord(conn.RemoteAddr().String(), []byte{0x00}, func(meta interface{}, data []byte) {
+		fmt.Println(data)
+	})
+
 	for {
 		select {
-		case readStr := <-b.readChan:
-			// callback
-			getData(readStr)
-			// b.writeChan <- readStr
+		// abandon function
+		//case readStr := <-b.readChan:
+		//	getData(readStr)
 		case stop := <-b.stopChan:
 			// 弹出
 			if stop {
@@ -51,8 +40,26 @@ func HandleProcessor(conn net.Conn) {
 	}
 }
 
-func getData(msg []byte) {
-	fmt.Println("Got: ", msg)
+//func SendMeasure(addr string, data []byte, callback func(meta interface{}, data []byte)) {
+//	SessionCollection[addr].writeChan <- data
+//	for {
+//		select {
+//		case readData := <-SessionCollection[addr].readChan:
+//			callback(9, readData)
+//			return
+//		}
+//	}
+//}
+
+func SendWord(addr string, data []byte, callback func(meta interface{}, data []byte)) {
+	SessionCollection[addr].writeChan <- data
+	for {
+		select {
+		case readData := <-SessionCollection[addr].readChan:
+			callback(8, readData)
+			return
+		}
+	}
 }
 
 func readConn(conn net.Conn, readChan chan<- []byte, stopChan chan<- bool) {
