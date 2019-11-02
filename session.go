@@ -1,6 +1,7 @@
 package sensor
 
 import (
+	"fmt"
 	"net"
 	"strings"
 	"sync"
@@ -45,6 +46,14 @@ func GetDeviceSession(addr string) (DeviceSession, bool) {
 	} else {
 		return DeviceSession{}, false
 	}
+}
+
+/**
+ * delete key-value on sync hashMap
+ */
+func (ds *DeviceSession) KillDevice() {
+	SessionsCollection.Delete(strings.Split(ds.conn.RemoteAddr().String(), ":")[0])
+	fmt.Println(SessionsCollection)
 }
 
 /**

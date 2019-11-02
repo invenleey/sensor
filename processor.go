@@ -32,6 +32,7 @@ func HandleProcessor(conn net.Conn) {
 			// 弹出
 			if stop {
 				fmt.Println("[断开]", conn.RemoteAddr())
+				b.KillDevice()
 				break
 			}
 		}
