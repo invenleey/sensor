@@ -3,7 +3,6 @@ package sensor
 import (
 	"fmt"
 	"gopkg.in/mgo.v2/bson"
-	//"dev.atomtree.cn/atom/da"
 )
 
 type DeviceOperation interface {
@@ -118,7 +117,7 @@ func Config(Data []byte, callback func(meta interface{}, data []byte)) {
 func MeasureRequest(addr string, callback func(meta interface{}, data []byte)) {
 	da := ComposeBody([]byte{0x06}, ReadFunc, RRegMeasure)
 	fmt.Println("test: ", da)
-	SendWord(addr, da, callback)
+	// SendWord(addr, da, callback)
 }
 
 func ConfigRequest(id bson.ObjectId, funcCode []byte, callback func(meta interface{}, data []byte)) {

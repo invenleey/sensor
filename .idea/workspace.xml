@@ -3,10 +3,31 @@
   <component name="ChangeListManager">
     <list default="true" id="651a59bc-957f-466d-b5b6-7e1bb7cecee5" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/processor.go" beforeDir="false" afterPath="$PROJECT_DIR$/processor.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sensor.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensor.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sensor_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensor_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/session.go" beforeDir="false" afterPath="$PROJECT_DIR$/session.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tcp.go" beforeDir="false" afterPath="$PROJECT_DIR$/tcp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tcp_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/tcp_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/bson/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/bson/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/bson/bson.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/bson/bson.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/bson/decimal.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/bson/decimal.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/bson/decode.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/bson/decode.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/bson/encode.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/bson/encode.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/bson/json.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/bson/json.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/decode.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/decode.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/encode.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/encode.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/extension.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/extension.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/fold.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/fold.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/indent.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/indent.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/scanner.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/scanner.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/stream.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/stream.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/tags.go" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/gopkg.in/mgo.v2/internal/json/tags.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vendor/modules.txt" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/modules.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -51,7 +72,7 @@
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
     <property name="go.vendoring.notification.had.been.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../pond" />
     <property name="settings.editor.selected.configurable" value="go.vgo" />
   </component>
   <component name="RunDashboard">
@@ -67,7 +88,7 @@
     </option>
   </component>
   <component name="RunManager" selected="Go Test.TestIoT in sensor">
-    <configuration name="TestComposeBody in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestBytesToIn in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="sensor" />
       <working_directory value="$PROJECT_DIR$" />
       <framework value="gotest" />
@@ -75,7 +96,7 @@
       <package value="sensor" />
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestComposeBody$" />
+      <pattern value="^TestBytesToIn$" />
       <method v="2" />
     </configuration>
     <configuration name="TestIoT in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -125,10 +146,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Go Test.TestIoT in sensor" />
+        <item itemvalue="Go Test.TestBytesToIn in sensor" />
         <item itemvalue="Go Test.TestSplitMeasure in sensor" />
         <item itemvalue="Go Test.TestSplitConfig in sensor" />
         <item itemvalue="Go Test.TestSplitBody in sensor" />
-        <item itemvalue="Go Test.TestComposeBody in sensor" />
       </list>
     </recent_temporary>
   </component>
@@ -173,7 +194,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/sensor.go</url>
-          <line>70</line>
+          <line>69</line>
           <option name="timeStamp" value="17" />
         </line-breakpoint>
       </breakpoints>

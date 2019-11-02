@@ -1,3 +1,5 @@
+# github.com/fwhezfwhez/go-queue v0.0.0-20191024012148-0ed4385a26c2
+github.com/fwhezfwhez/go-queue
 # gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 gopkg.in/mgo.v2/bson
 gopkg.in/mgo.v2/internal/json

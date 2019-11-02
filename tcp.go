@@ -6,7 +6,6 @@ import (
 )
 
 func RunDeviceTCP() {
-	SessionsInit()
 	listener, err := net.Listen("tcp", ":1080")
 	if err != nil {
 		fmt.Println("err = ", err)
