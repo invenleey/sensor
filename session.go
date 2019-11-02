@@ -16,8 +16,16 @@ type DeviceSession struct {
 	sync.Mutex
 }
 
-type SeaTurtle interface {
-	GetDeviceData(d []byte)
+type Ds interface {
+	KillDevice()
+	SendWord(data []byte, callback func(meta interface{}, data []byte))
+
+	OpenReadTimeout()
+	StopReadTimeout()
+
+	ReadConn()
+	WriteConn()
+	HeartBeating(timeout int)
 }
 
 var SessionsCollection sync.Map
