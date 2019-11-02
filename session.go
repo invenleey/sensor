@@ -61,7 +61,6 @@ func GetDeviceSession(addr string) (DeviceSession, bool) {
  */
 func (ds *DeviceSession) KillDevice() {
 	SessionsCollection.Delete(strings.Split(ds.conn.RemoteAddr().String(), ":")[0])
-	fmt.Println(SessionsCollection)
 }
 
 /**
@@ -76,8 +75,13 @@ func (ds *DeviceSession) SendWord(data []byte, callback func(meta interface{}, d
 	for {
 		select {
 		case readData := <-ds.readChan:
-			callback(8, readData)
 			ds.StopReadTimeout()
+			df, md, err := SplitMeasure(readData)
+			if err != nil {
+				fmt.Println("error data")
+			} else {
+				callback(df, md)
+			}
 			ds.Unlock()
 			return
 		}
@@ -88,7 +92,7 @@ func (ds *DeviceSession) SendWord(data []byte, callback func(meta interface{}, d
  * read timeout open
  */
 func (ds *DeviceSession) OpenReadTimeout() {
-	if err := ds.conn.SetReadDeadline(time.Now().Add(5 * time.Second)); err != nil {
+	if err := ds.conn.SetReadDeadline(time.Now().Add(15 * time.Second)); err != nil {
 		// error happened
 		ds.stopChan <- true
 	}

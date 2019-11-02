@@ -5,17 +5,22 @@ import (
 	"net"
 )
 
+const (
+	Network = "tcp"
+	Address = ":1080"
+)
+
 func RunDeviceTCP() {
-	listener, err := net.Listen("tcp", ":1080")
+	listener, err := net.Listen(Network, Address)
 	if err != nil {
-		fmt.Println("err = ", err)
+		fmt.Println("[错误]", err)
 		return
 	}
 	defer listener.Close()
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			fmt.Println("err =", err)
+			fmt.Println("[错误]", err)
 			return
 		}
 		go HandleProcessor(conn)

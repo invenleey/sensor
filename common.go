@@ -67,8 +67,8 @@ func SplitConfig(src []byte) ([]byte, []byte, []byte, error) {
 /**
  * separate measure command parameters
  * @params src is a measure respond data
+ * @params ByteCount
  * @return DeviceAddr and FuncCode
- * @return ByteCount
  * @return MeasureData
  */
 func SplitMeasure(src []byte) ([]byte, []byte, error) {

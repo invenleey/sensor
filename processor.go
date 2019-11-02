@@ -25,11 +25,8 @@ func HandleProcessor(conn net.Conn) {
 
 	for {
 		select {
-		// abandon function
-		// case _ = <-b.readChan:
-		// getData(readStr)
 		case stop := <-b.stopChan:
-			// 弹出
+			// pick out
 			if stop {
 				fmt.Println("[断开]", conn.RemoteAddr())
 				b.KillDevice()
