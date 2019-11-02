@@ -37,7 +37,7 @@ func RegDeviceSession(conn net.Conn) DeviceSession {
 
 /**
  * return the device session which search for
- * if a non-existent, return {} and false
+ * if a non-existent key, return {} and false
  */
 func GetDeviceSession(addr string) (DeviceSession, bool) {
 	if v, ok := SessionsCollection.Load(addr); ok {
@@ -55,10 +55,12 @@ func GetDeviceSession(addr string) (DeviceSession, bool) {
 func (ds *DeviceSession) SendWord(data []byte, callback func(meta interface{}, data []byte)) {
 	ds.Lock()
 	ds.writeChan <- data
+	ds.OpenReadTimeout()
 	for {
 		select {
 		case readData := <-ds.readChan:
 			callback(8, readData)
+			ds.StopReadTimeout()
 			ds.Unlock()
 			return
 		}
@@ -66,9 +68,30 @@ func (ds *DeviceSession) SendWord(data []byte, callback func(meta interface{}, d
 }
 
 /**
+ * read timeout open
+ */
+func (ds *DeviceSession) OpenReadTimeout() {
+	if err := ds.conn.SetReadDeadline(time.Now().Add(5 * time.Second)); err != nil {
+		// error happened
+		ds.stopChan <- true
+	}
+}
+
+/**
+ * read timeout stop
+ */
+func (ds *DeviceSession) StopReadTimeout() {
+	// it is absoluteZeroYear = -292277022399
+	if err := ds.conn.SetReadDeadline(time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)); err != nil {
+		// error happened
+		ds.stopChan <- true
+	}
+}
+
+/**
  * read
  */
-func (ds *DeviceSession) readConn() {
+func (ds *DeviceSession) ReadConn() {
 	for {
 		data := make([]byte, 20, 20)
 		if _, err := ds.conn.Read(data); err != nil {
@@ -82,7 +105,7 @@ func (ds *DeviceSession) readConn() {
 /**
  * write
  */
-func (ds *DeviceSession) writeConn() {
+func (ds *DeviceSession) WriteConn() {
 	for {
 		data := <-ds.writeChan
 		if _, err := ds.conn.Write(data); err != nil {

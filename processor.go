@@ -10,8 +10,8 @@ func HandleProcessor(conn net.Conn) {
 	defer conn.Close()
 	// session
 	b := RegDeviceSession(conn)
-	go b.readConn()
-	go b.writeConn()
+	go b.ReadConn()
+	go b.WriteConn()
 	// go b.HeartBeating(20)
 
 	// testing
