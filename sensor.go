@@ -191,13 +191,22 @@ func (ds *DeviceSession) GetMeasureResultInstance() MeasureResult {
  * @param data the measure data which will be decoded
  * @param df is the deviceAddr and funcCode
  */
-func (mr *MeasureResult) DecodeMeasureByte(meta DeviceMeta, data []byte, itemsName []string) error {
+func (mr *MeasureResult) DecodeMeasureByte(meta DeviceMeta, data []byte, funcCode byte, itemsName []string) error {
 	v, err := FourByteToFloat(data)
 	if err != nil {
 		return err
 	}
 	if len(v) != len(itemsName) {
 		return errors.New("error itemsName count")
+	}
+	if meta.FuncCode == funcCode+0x80 {
+		if data[0] == 0x01 {
+			mr.DeviceAddr = meta.Addr
+			mr.FuncCode = meta.FuncCode
+			return errors.New("error v-order")
+		} else {
+			return errors.New("error v-data")
+		}
 	}
 	// inject content
 	mr.DeviceAddr = meta.Addr

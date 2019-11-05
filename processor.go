@@ -17,13 +17,13 @@ func HandleProcessor(conn net.Conn) {
 	// testing
 	go b.SendWord([]byte{0x06, 0x03, 0x00, 0x00, 0x00, 0x04, 0x45, 0xBE}, func(meta DeviceMeta, data []byte) {
 		p := b.GetMeasureResultInstance()
-		_ = p.DecodeMeasureByte(meta, data, []string{"测量值", "温度"})
+		_ = p.DecodeMeasureByte(meta, data, 0x03, []string{"测量值", "温度"})
 		fmt.Println(p)
 	})
 
-	//go b.SendWord([]byte{0x01}, func(meta DeviceMeta, data []byte) {
-	//	fmt.Println(data)
-	//})
+	go b.SendWord([]byte{0x01}, func(meta DeviceMeta, data []byte) {
+		fmt.Println(data)
+	})
 
 	for {
 		select {
