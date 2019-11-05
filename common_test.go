@@ -42,3 +42,37 @@ func TestSplitMeasure(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestFourByteToFloat(t *testing.T) {
+	// 4 bytes output
+	v := []byte{0x01, 0x02, 0x00, 0x02}
+	fmt.Println(FourByteToFloat(v))
+	v = []byte{0x00, 0xB0, 0x00, 0x01}
+	fmt.Println(FourByteToFloat(v))
+
+	// 8 bytes output
+	v = []byte{0x01, 0x02, 0x00, 0x02, 0x00, 0xB0, 0x00, 0x01}
+	fmt.Println(FourByteToFloat(v))
+
+	//16 byte output
+	v = []byte{0x01, 0x02, 0x00, 0x02, 0x00, 0xB0, 0x00, 0x01, 0x01, 0x02, 0x00, 0x02, 0x00, 0xB0, 0x00, 0x01}
+	fmt.Println(FourByteToFloat(v))
+
+	// error output type(error byte count)
+	v = []byte{0x01, 0x02, 0x00}
+	_, err := FourByteToFloat(v)
+	if err == nil {
+		t.Fail()
+	}
+	// error output type(nil byte input)
+	v = []byte{}
+	_, err = FourByteToFloat(v)
+	if err == nil {
+		t.Fail()
+	}
+}
+
+func TestByteToFloat(t *testing.T) {
+	v := []byte{0x1, 0x2}
+	fmt.Println(ByteToFloat(v))
+}

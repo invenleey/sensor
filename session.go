@@ -63,12 +63,17 @@ func (ds *DeviceSession) KillDevice() {
 	SessionsCollection.Delete(strings.Split(ds.conn.RemoteAddr().String(), ":")[0])
 }
 
+type DeviceMeta struct {
+	Addr     byte
+	FuncCode byte
+}
+
 /**
  * send bytes to device
  * this Device must reg info last send message
  * the callback func will return data when the device send
  */
-func (ds *DeviceSession) SendWord(data []byte, callback func(meta interface{}, data []byte)) {
+func (ds *DeviceSession) SendWord(data []byte, callback func(dm DeviceMeta, data []byte)) {
 	ds.Lock()
 	ds.writeChan <- data
 	ds.OpenReadTimeout()
@@ -80,7 +85,10 @@ func (ds *DeviceSession) SendWord(data []byte, callback func(meta interface{}, d
 			if err != nil {
 				fmt.Println("error data")
 			} else {
-				callback(df, md)
+				var tempDm DeviceMeta
+				tempDm.Addr = df[0]
+				tempDm.FuncCode = df[1]
+				callback(tempDm, md)
 			}
 			ds.Unlock()
 			return

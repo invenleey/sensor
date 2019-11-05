@@ -4,11 +4,11 @@
     <list default="true" id="651a59bc-957f-466d-b5b6-7e1bb7cecee5" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/common.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/common_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/processor.go" beforeDir="false" afterPath="$PROJECT_DIR$/processor.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sensor.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensor.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sensor_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensor_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/session.go" beforeDir="false" afterPath="$PROJECT_DIR$/session.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tcp.go" beforeDir="false" afterPath="$PROJECT_DIR$/tcp.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -69,8 +69,8 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Test.TestIoT in sensor">
-    <configuration name="TestBytesToIn in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.TestIoT in sensor (1)">
+    <configuration name="TestByteToInt in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="sensor" />
       <working_directory value="$PROJECT_DIR$" />
       <framework value="gotest" />
@@ -78,7 +78,29 @@
       <package value="sensor" />
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestBytesToIn$" />
+      <pattern value="^TestByteToInt$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestFourByteToFloat in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="sensor" />
+      <working_directory value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="sensor" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestFourByteToFloat$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestIoT in sensor (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="sensor" />
+      <working_directory value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="sensor" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestIoT$" />
       <method v="2" />
     </configuration>
     <configuration name="TestIoT in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -92,7 +114,7 @@
       <pattern value="^TestIoT$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestSplitBody in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="go test sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="sensor" />
       <working_directory value="$PROJECT_DIR$" />
       <framework value="gotest" />
@@ -100,38 +122,15 @@
       <package value="sensor" />
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestSplitBody$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestSplitConfig in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="sensor" />
-      <working_directory value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="sensor" />
-      <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestSplitConfig$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestSplitMeasure in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="sensor" />
-      <working_directory value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="sensor" />
-      <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestSplitMeasure$" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestIoT in sensor (1)" />
+        <item itemvalue="Go Test.go test sensor" />
+        <item itemvalue="Go Test.TestFourByteToFloat in sensor" />
+        <item itemvalue="Go Test.TestByteToInt in sensor" />
         <item itemvalue="Go Test.TestIoT in sensor" />
-        <item itemvalue="Go Test.TestBytesToIn in sensor" />
-        <item itemvalue="Go Test.TestSplitMeasure in sensor" />
-        <item itemvalue="Go Test.TestSplitConfig in sensor" />
-        <item itemvalue="Go Test.TestSplitBody in sensor" />
       </list>
     </recent_temporary>
   </component>
@@ -179,9 +178,9 @@
           <option name="timeStamp" value="17" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/common.go</url>
-          <line>74</line>
-          <option name="timeStamp" value="29" />
+          <url>file://$PROJECT_DIR$/session.go</url>
+          <line>83</line>
+          <option name="timeStamp" value="36" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

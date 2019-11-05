@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
-	"gopkg.in/mgo.v2/bson"
+	"fmt"
+	"math"
+	"strconv"
 )
 
 /**
@@ -79,9 +81,32 @@ func SplitMeasure(src []byte) ([]byte, []byte, error) {
 	return nil, nil, errors.New("got error data")
 }
 
-/**
- * get device information from database
- */
-func GetDeviceInfo(id bson.ObjectId) {
+const HexValue = 256
 
+func ByteToFloat(v []byte) float64 {
+	return float64(v[0])*HexValue + float64(v[1])
+}
+
+func FourByteToFloat(v []byte) ([]float64, error) {
+	count := len(v)
+	if count%4 != 0 || count == 0 {
+		return nil, errors.New("get error type")
+	}
+	var iter = 0
+	var ret []float64
+	for {
+		i := DecimalFloat(ByteToFloat(v[0+iter:2+iter]) * math.Pow(0.1, ByteToFloat(v[2+iter:4+iter])))
+		ret = append(ret, i)
+		if iter+4 == count {
+			break
+		} else {
+			iter += 4
+		}
+	}
+	return ret, nil
+}
+
+func DecimalFloat(value float64) float64 {
+	value, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", value), 64)
+	return value
 }
