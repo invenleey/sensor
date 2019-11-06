@@ -158,7 +158,7 @@ func RemoteDevice(id bson.ObjectId) {
 /**
  * the measure values struct
  */
-type MeasureResult struct {
+type ReadResult struct {
 	// unique DeviceID in node server
 	DeviceAddr byte
 	// Function Code which had been operate
@@ -170,6 +170,9 @@ type MeasureResult struct {
 
 	// node server ip
 	NodeIP string
+
+	// error tag
+	status int
 }
 
 type MeasureItem struct {
@@ -180,10 +183,19 @@ type MeasureItem struct {
 /**
  * @return a measureResult data struct
  */
-func (ds *DeviceSession) GetMeasureResultInstance() MeasureResult {
-	var ins MeasureResult
+func (ds *DeviceSession) GetReadResultInstance(meta DeviceMeta) (ReadResult, error) {
+	var ins ReadResult
+
+	ins.DeviceAddr = meta.Addr
+	ins.FuncCode = meta.FuncCode
 	ins.NodeIP = ds.conn.RemoteAddr().String()
-	return ins
+	// check order whether is wrong
+	if meta.FuncCode > 0x80 {
+		ins.status = 1
+		ins.FuncCode -= 0x80
+		return ins, errors.New("unknown order")
+	}
+	return ins, nil
 }
 
 /**
@@ -191,7 +203,7 @@ func (ds *DeviceSession) GetMeasureResultInstance() MeasureResult {
  * @param data the measure data which will be decoded
  * @param df is the deviceAddr and funcCode
  */
-func (mr *MeasureResult) DecodeMeasureByte(meta DeviceMeta, data []byte, funcCode byte, itemsName []string) error {
+func (mr *ReadResult) DecodeStandardFourByte2Float(data []byte, itemsName []string) error {
 	v, err := FourByteToFloat(data)
 	if err != nil {
 		return err
@@ -199,18 +211,8 @@ func (mr *MeasureResult) DecodeMeasureByte(meta DeviceMeta, data []byte, funcCod
 	if len(v) != len(itemsName) {
 		return errors.New("error itemsName count")
 	}
-	if meta.FuncCode == funcCode+0x80 {
-		if data[0] == 0x01 {
-			mr.DeviceAddr = meta.Addr
-			mr.FuncCode = meta.FuncCode
-			return errors.New("error v-order")
-		} else {
-			return errors.New("error v-data")
-		}
-	}
+
 	// inject content
-	mr.DeviceAddr = meta.Addr
-	mr.FuncCode = meta.FuncCode
 	mr.InfoCount = len(v)
 	for i, k := range v {
 		var item MeasureItem
@@ -218,5 +220,17 @@ func (mr *MeasureResult) DecodeMeasureByte(meta DeviceMeta, data []byte, funcCod
 		item.Value = k
 		mr.Items = append(mr.Items, item)
 	}
+	return nil
+}
+
+func (mr *ReadResult) DecodeSlope(data []byte, itemName string) error {
+	v, err := TwoByteToFloatX1000(data)
+	if err != nil {
+		return errors.New("get error type")
+	}
+	var item MeasureItem
+	item.Name = itemName
+	item.Value = v
+	mr.Items = append(mr.Items, item)
 	return nil
 }

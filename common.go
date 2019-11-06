@@ -73,12 +73,19 @@ func SplitConfig(src []byte) ([]byte, []byte, []byte, error) {
  * @return DeviceAddr and FuncCode
  * @return MeasureData
  */
-func SplitMeasure(src []byte) ([]byte, []byte, error) {
-	ByteCount := src[2] + 3
-	if ValidateCRC(src[:ByteCount], src[ByteCount:ByteCount+2]) {
-		return src[:2], src[3:ByteCount], nil
+func SplitMeasure(src []byte) (DeviceMeta, []byte, error) {
+	base := len(src) - 2
+	if ValidateCRC(src[:base], src[base:]) {
+		var meta DeviceMeta
+		meta.Addr = src[0]
+		meta.FuncCode = src[1]
+		if src[1] > 0x80 {
+			return meta, src[2:base], nil
+		} else {
+			return meta, src[3:base], nil
+		}
 	}
-	return nil, nil, errors.New("got error data")
+	return DeviceMeta{}, nil, errors.New("unreachable validate")
 }
 
 const HexValue = 256
@@ -109,4 +116,18 @@ func FourByteToFloat(v []byte) ([]float64, error) {
 func DecimalFloat(value float64) float64 {
 	value, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", value), 64)
 	return value
+}
+
+func TwoByteToFloatX1000(v []byte) (float64, error) {
+	count := len(v)
+	if count > 2 || count == 0 {
+		return 0, errors.New("get error type")
+	}
+	var ret float64
+	ret = ByteToFloat(v) / 1000
+	return ret, nil
+}
+
+func T()  {
+	
 }

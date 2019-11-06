@@ -15,15 +15,33 @@ func HandleProcessor(conn net.Conn) {
 	// go b.HeartBeating(20)
 
 	// testing
-	go b.SendWord([]byte{0x06, 0x03, 0x00, 0x00, 0x00, 0x04, 0x45, 0xBE}, func(meta DeviceMeta, data []byte) {
-		p := b.GetMeasureResultInstance()
-		_ = p.DecodeMeasureByte(meta, data, 0x03, []string{"测量值", "温度"})
-		fmt.Println(p)
-	})
+	//go b.SendWord([]byte{0x06, 0x03, 0x00, 0x00, 0x00, 0x04, 0x45, 0xBE}, func(meta DeviceMeta, data []byte) {
+	//	p, err := b.GetReadResultInstance(meta)
+	//	if err != nil {
+	//		fmt.Println(err)
+	//	}
+	//	if err = p.DecodeMeasureByte(data, []string{"测量值", "温度"}); err != nil {
+	//		fmt.Println(err)
+	//	} else {
+	//		fmt.Println(p)
+	//	}
+	//})
 
-	go b.SendWord([]byte{0x01}, func(meta DeviceMeta, data []byte) {
-		fmt.Println(data)
+	go b.SendWord([]byte{0x06, 0x03, 0x10, 0x06, 0x00, 0x01, 0x61, 0x7C}, func(meta DeviceMeta, data []byte) {
+		p, err := b.GetReadResultInstance(meta)
+		if err != nil {
+			fmt.Println(err)
+		}
+		if err = p.DecodeSlope(data, "零点校准值"); err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(p)
+		}
 	})
+	//
+	//go b.SendWord([]byte{0x01}, func(meta DeviceMeta, data []byte) {
+	//	fmt.Println(data)
+	//})
 
 	for {
 		select {

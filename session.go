@@ -16,9 +16,9 @@ type DeviceSession struct {
 	sync.Mutex
 }
 
-type Ds interface {
+type interfaceDevice interface {
 	KillDevice()
-	SendWord(data []byte, callback func(meta interface{}, data []byte))
+	SendWord(data []byte, callback func(dm DeviceMeta, data []byte))
 
 	OpenReadTimeout()
 	StopReadTimeout()
@@ -26,6 +26,8 @@ type Ds interface {
 	ReadConn()
 	WriteConn()
 	HeartBeating(timeout int)
+
+	GetReadResultInstance() ReadResult
 }
 
 var SessionsCollection sync.Map
@@ -81,14 +83,11 @@ func (ds *DeviceSession) SendWord(data []byte, callback func(dm DeviceMeta, data
 		select {
 		case readData := <-ds.readChan:
 			ds.StopReadTimeout()
-			df, md, err := SplitMeasure(readData)
+			dm, md, err := SplitMeasure(readData)
 			if err != nil {
 				fmt.Println("error data")
 			} else {
-				var tempDm DeviceMeta
-				tempDm.Addr = df[0]
-				tempDm.FuncCode = df[1]
-				callback(tempDm, md)
+				callback(dm, md)
 			}
 			ds.Unlock()
 			return
@@ -122,11 +121,14 @@ func (ds *DeviceSession) StopReadTimeout() {
  */
 func (ds *DeviceSession) ReadConn() {
 	for {
-		data := make([]byte, 20, 20)
-		if _, err := ds.conn.Read(data); err != nil {
+
+		data := make([]byte, 20)
+		// var data []byte
+		n, err := ds.conn.Read(data)
+		if err != nil {
 			break
 		}
-		ds.readChan <- data
+		ds.readChan <- data[:n]
 	}
 	ds.stopChan <- true
 }

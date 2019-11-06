@@ -37,7 +37,7 @@ func TestSplitConfig(t *testing.T) {
 func TestSplitMeasure(t *testing.T) {
 	rs := []byte{0x06, 0x03, 0x08, 0x04, 0x7F, 0x00, 0x02, 0x01, 0x1E, 0x00, 0x01, 0xD9, 0x6D}
 	a, b, e := SplitMeasure(rs)
-	println(a, b, e)
+	println(a.FuncCode, b, e)
 	if e != nil {
 		t.Fail()
 	}
