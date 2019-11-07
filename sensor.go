@@ -166,7 +166,12 @@ type ReadResult struct {
 	// Information Count
 	InfoCount int
 
+	// read
 	Items []MeasureItem
+
+	// order
+	WriteData []byte
+	WriteReg []byte
 
 	// node server ip
 	NodeIP string
@@ -183,7 +188,7 @@ type MeasureItem struct {
 /**
  * @return a measureResult data struct
  */
-func (ds *DeviceSession) GetReadResultInstance(meta DeviceMeta) (ReadResult, error) {
+func (ds *DeviceSession) GetResultInstance(meta DeviceMeta) (ReadResult, error) {
 	var ins ReadResult
 
 	ins.DeviceAddr = meta.Addr
@@ -232,5 +237,28 @@ func (mr *ReadResult) DecodeSlope(data []byte, itemName string) error {
 	item.Name = itemName
 	item.Value = v
 	mr.Items = append(mr.Items, item)
+	return nil
+}
+
+// ====================================Write Process======================================== //
+//type WriteResult struct {
+//	// unique DeviceID in node server
+//	DeviceAddr byte
+//	// Function Code which had been operate
+//	FuncCode byte
+//
+//
+//	// node server ip
+//	NodeIP string
+//
+//	// error tag
+//	// 0 succeed
+//	// 1 failed
+//	status int
+//}
+
+func (mr *ReadResult) DecodeOrder(data []byte) error {
+	mr.WriteData = data[2:]
+	mr.WriteReg = data[:2]
 	return nil
 }

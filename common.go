@@ -81,8 +81,10 @@ func SplitMeasure(src []byte) (DeviceMeta, []byte, error) {
 		meta.FuncCode = src[1]
 		if src[1] > 0x80 {
 			return meta, src[2:base], nil
-		} else {
+		} else if src[1] == 0x03 {
 			return meta, src[3:base], nil
+		} else if src[1] == 0x06 {
+			return meta, src[2:base], nil
 		}
 	}
 	return DeviceMeta{}, nil, errors.New("unreachable validate")
@@ -128,6 +130,6 @@ func TwoByteToFloatX1000(v []byte) (float64, error) {
 	return ret, nil
 }
 
-func T()  {
-	
+func T() {
+
 }

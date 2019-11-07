@@ -70,6 +70,11 @@ type DeviceMeta struct {
 	FuncCode byte
 }
 
+//type interfaceSplit interface {
+//	ByteSplit(src []byte) (DeviceMeta, []byte, error)
+//	GetData() []byte
+//}
+
 /**
  * send bytes to device
  * this Device must reg info last send message
