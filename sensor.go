@@ -3,6 +3,7 @@ package sensor
 import (
 	"errors"
 	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
 type DeviceOperation interface {
@@ -88,22 +89,23 @@ func (i Sensor) SetDefault() {
 var InfoMK map[string][]byte
 
 func InitInfoMK() {
+	InfoMK = make(map[string][]byte)
 	// Function Code Type Map
 	// Read 0x03
 	// Write 0x06
 	InfoMK["ReadFunc"] = []byte{0x03}
 	InfoMK["WriteFunc"] = []byte{0x06}
 
-	InfoMK["RRegMeasure"] = []byte{0x00, 0x00, 0x00, 0x04}
-	InfoMK["WRegOxygen"] = []byte{0x10, 0x04}
-	InfoMK["WRegZero"] = []byte{0x10, 0x00}
-	InfoMK["WRegTilt"] = []byte{0x10, 0x04}
+	InfoMK["RMeasure"] = []byte{0x00, 0x00, 0x00, 0x04}
+	InfoMK["WOxygen"] = []byte{0x00, 0x04, 0x00, 0x01}
+	InfoMK["WZero"] = []byte{0x10, 0x00, 0x00, 0x01}
+	InfoMK["WTilt"] = []byte{0x10, 0x04, 0x00, 0x01}
 
-	InfoMK["RRegZero"] = []byte{010, 0x06}
-	InfoMK["RRegTilt"] = []byte{0x10, 0x08}
+	InfoMK["RZero"] = []byte{010, 0x06, 0x00, 0x01}
+	InfoMK["RTilt"] = []byte{0x10, 0x08, 0x00, 0x01}
 
-	InfoMK["ARegAddr"] = []byte{0x20, 0x02}
-	InfoMK["WRegFactory"] = []byte{0x20, 0x20}
+	InfoMK["RAddr"] = []byte{0x20, 0x02, 0x00, 0x01}
+	InfoMK["WFactory"] = []byte{0x20, 0x20, 0x00, 0x01}
 
 }
 
@@ -127,10 +129,10 @@ func InitInfoMK() {
 //
 //var request []byte
 
-// Measure(read)
-func Measure(addr []byte, callback func(meta interface{}, data []byte)) {
-
-}
+//// Measure(read)
+//func Measure(addr []byte, callback func(meta interface{}, data []byte)) {
+//
+//}
 
 // Config(write)
 func Config(Data []byte, callback func(meta interface{}, data []byte)) {
@@ -147,42 +149,37 @@ func ConfigRequest(id bson.ObjectId, funcCode []byte, callback func(meta interfa
 
 }
 
-func AddDevice(id bson.ObjectId) {
-
-}
-
-func RemoteDevice(id bson.ObjectId) {
-
-}
-
 /**
  * the measure values struct
  */
 type ReadResult struct {
 	// unique DeviceID in node server
-	DeviceAddr byte
+	DeviceAddr byte `json:"deviceAddr"`
 	// Function Code which had been operate
-	FuncCode byte
+	FuncCode byte `json:"funcCode"`
 	// Information Count
-	InfoCount int
+	InfoCount int `json:"infoCount"`
 
 	// read
-	Items []MeasureItem
+	Items []MeasureItem `json:"items,omitempty"`
 
 	// order
-	WriteData []byte
-	WriteReg []byte
+	WriteData []byte `json:"writeData,omitempty"`
+	WriteReg  []byte `json:"writeReg,omitempty"`
 
 	// node server ip
-	NodeIP string
+	NodeIP string `json:"nodeIP"`
+
+	// create time
+	Created time.Time `json:"created"`
 
 	// error tag
-	status int
+	Status int `json:"status"`
 }
 
 type MeasureItem struct {
-	Name  string
-	Value float64
+	Name  string  `json:"name"`
+	Value float64  `json:"value"`
 }
 
 /**
@@ -191,12 +188,13 @@ type MeasureItem struct {
 func (ds *DeviceSession) GetResultInstance(meta DeviceMeta) (ReadResult, error) {
 	var ins ReadResult
 
+	ins.Created = time.Now()
 	ins.DeviceAddr = meta.Addr
 	ins.FuncCode = meta.FuncCode
 	ins.NodeIP = ds.conn.RemoteAddr().String()
 	// check order whether is wrong
 	if meta.FuncCode > 0x80 {
-		ins.status = 1
+		ins.Status = 1
 		ins.FuncCode -= 0x80
 		return ins, errors.New("unknown order")
 	}
@@ -262,3 +260,5 @@ func (mr *ReadResult) DecodeOrder(data []byte) error {
 	mr.WriteReg = data[:2]
 	return nil
 }
+
+

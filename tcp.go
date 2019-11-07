@@ -11,6 +11,7 @@ const (
 )
 
 func RunDeviceTCP() {
+	InitInfoMK()
 	listener, err := net.Listen(Network, Address)
 	if err != nil {
 		fmt.Println("[错误]", err)
@@ -22,7 +23,7 @@ func RunDeviceTCP() {
 		if err != nil {
 			fmt.Println("[错误]", err)
 			return
-		}
+	}
 		go HandleProcessor(conn)
 	}
 }

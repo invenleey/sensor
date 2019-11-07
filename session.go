@@ -1,6 +1,7 @@
 package sensor
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -14,6 +15,7 @@ type DeviceSession struct {
 	stopChan  chan bool
 	conn      net.Conn
 	sync.Mutex
+	interfaceDevice
 }
 
 type interfaceDevice interface {
@@ -27,7 +29,7 @@ type interfaceDevice interface {
 	WriteConn()
 	HeartBeating(timeout int)
 
-	GetReadResultInstance() ReadResult
+	GetResultInstance(meta DeviceMeta) (ReadResult, error)
 }
 
 var SessionsCollection sync.Map
@@ -59,6 +61,19 @@ func GetDeviceSession(addr string) (DeviceSession, bool) {
 }
 
 /**
+ * show all device node ip in this -> lan
+ * @return a string array include all node server ip
+ */
+func ShowNodeIPs() []string {
+	var ret []string
+	SessionsCollection.Range(func(key, value interface{}) bool {
+		ret = append(ret, key.(string))
+		return true
+	})
+	return ret
+}
+
+/**
  * delete key-value on sync hashMap
  */
 func (ds *DeviceSession) KillDevice() {
@@ -80,7 +95,7 @@ type DeviceMeta struct {
  * this Device must reg info last send message
  * the callback func will return data when the device send
  */
-func (ds *DeviceSession) SendWord(data []byte, callback func(dm DeviceMeta, data []byte)) {
+func (ds *DeviceSession) SendWord(data []byte, callback func(dm DeviceMeta, data []byte) (ReadResult, error)) (ReadResult, error) {
 	ds.Lock()
 	ds.writeChan <- data
 	ds.OpenReadTimeout()
@@ -89,13 +104,14 @@ func (ds *DeviceSession) SendWord(data []byte, callback func(dm DeviceMeta, data
 		case readData := <-ds.readChan:
 			ds.StopReadTimeout()
 			dm, md, err := SplitMeasure(readData)
+			var rs ReadResult
 			if err != nil {
 				fmt.Println("error data")
 			} else {
-				callback(dm, md)
+				rs, err = callback(dm, md)
 			}
 			ds.Unlock()
-			return
+			return rs, err
 		}
 	}
 }
@@ -159,4 +175,47 @@ func (ds *DeviceSession) HeartBeating(timeout int) {
 		_ = ds.conn.SetDeadline(time.Now().Add(time.Duration(timeout) * time.Second))
 		break
 	}
+}
+
+func (ds *DeviceSession) MeasureRequest(rData []byte, itemsName []string) (ReadResult, error) {
+	p, err := ds.SendWord(rData, func(meta DeviceMeta, data []byte) (ReadResult, error) {
+		p, err := ds.GetResultInstance(meta)
+		if err != nil {
+			return ReadResult{}, errors.New("meta build error")
+		}
+		if err = p.DecodeStandardFourByte2Float(data, itemsName); err != nil {
+			return ReadResult{}, errors.New("decode build error")
+		} else {
+			return p, nil
+		}
+	})
+	if err != nil {
+		return ReadResult{}, err
+	} else {
+		return p, nil
+	}
+
+	//go b.SendWord([]byte{0x06, 0x03, 0x10, 0x06, 0x00, 0x01, 0x61, 0x7C}, func(meta DeviceMeta, data []byte) {
+	//	p, err := b.GetReadResultInstance(meta)
+	//	if err != nil {
+	//		fmt.Println(err)
+	//	}
+	//	if err = p.DecodeSlope(data, "斜率校准值"); err != nil {
+	//		fmt.Println(err)
+	//	} else {
+	//		fmt.Println(p)
+	//	}
+	//})
+
+	//go b.SendWord([]byte{0x06, 0x06, 0x20, 0x02, 0x00, 0x01, 0xE3, 0xBD}, func(meta DeviceMeta, data []byte) {
+	//	p, err := b.GetResultInstance(meta)
+	//	if err != nil {
+	//		fmt.Println(err)
+	//	}
+	//	if err = p.DecodeOrder(data); err != nil {
+	//		fmt.Println(err)
+	//	} else {
+	//		fmt.Println(p)
+	//	}
+	//})
 }
