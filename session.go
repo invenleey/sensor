@@ -20,7 +20,7 @@ type DeviceSession struct {
 
 type interfaceDevice interface {
 	KillDevice()
-	SendWord(data []byte, callback func(dm DeviceMeta, data []byte))
+	SendWord(data []byte, callback func(dm DeviceMeta, data []byte) (ReadResult, error)) (ReadResult, error)
 
 	OpenReadTimeout()
 	StopReadTimeout()

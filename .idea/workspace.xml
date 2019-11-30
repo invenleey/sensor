@@ -3,10 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="651a59bc-957f-466d-b5b6-7e1bb7cecee5" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/processor.go" beforeDir="false" afterPath="$PROJECT_DIR$/processor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensor.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/common.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/common_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/session.go" beforeDir="false" afterPath="$PROJECT_DIR$/session.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tcp.go" beforeDir="false" afterPath="$PROJECT_DIR$/tcp.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -35,7 +36,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="C:\Go" />
+  <component name="GOROOT" path="C:/Program Files/Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -55,6 +56,12 @@
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="go.vgo" />
   </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\sensor\cnf" />
+      <recent name="D:\sensor\cmd" />
+    </key>
+  </component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -67,19 +74,17 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Go Test.TestOpenKit in sensor">
-    <configuration name="TestByteToInt in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Build.go build sensor/cmd">
+    <configuration name="go build sensor/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="sensor" />
       <working_directory value="$PROJECT_DIR$" />
-      <framework value="gotest" />
       <kind value="PACKAGE" />
-      <package value="sensor" />
+      <filePath value="$PROJECT_DIR$/cmd/simple.go" />
+      <package value="sensor/cmd" />
       <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestByteToInt$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestFourByteToFloat in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestGetInformation in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="sensor" />
       <working_directory value="$PROJECT_DIR$" />
       <framework value="gotest" />
@@ -87,10 +92,10 @@
       <package value="sensor" />
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestFourByteToFloat$" />
+      <pattern value="^TestGetInformation$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestIoT in sensor (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestGetMQTTInstance in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="sensor" />
       <working_directory value="$PROJECT_DIR$" />
       <framework value="gotest" />
@@ -98,7 +103,7 @@
       <package value="sensor" />
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestIoT$" />
+      <pattern value="^TestGetMQTTInstance$" />
       <method v="2" />
     </configuration>
     <configuration name="TestOpenKit in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -112,7 +117,7 @@
       <pattern value="^TestOpenKit$" />
       <method v="2" />
     </configuration>
-    <configuration name="go test sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestReadDeviceList in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="sensor" />
       <working_directory value="$PROJECT_DIR$" />
       <framework value="gotest" />
@@ -120,15 +125,16 @@
       <package value="sensor" />
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestReadDeviceList$" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build sensor/cmd" />
+        <item itemvalue="Go Test.TestReadDeviceList in sensor" />
+        <item itemvalue="Go Test.TestGetInformation in sensor" />
+        <item itemvalue="Go Test.TestGetMQTTInstance in sensor" />
         <item itemvalue="Go Test.TestOpenKit in sensor" />
-        <item itemvalue="Go Test.TestIoT in sensor (1)" />
-        <item itemvalue="Go Test.go test sensor" />
-        <item itemvalue="Go Test.TestFourByteToFloat in sensor" />
-        <item itemvalue="Go Test.TestByteToInt in sensor" />
       </list>
     </recent_temporary>
   </component>
@@ -174,6 +180,11 @@
           <url>file://$PROJECT_DIR$/sensor.go</url>
           <line>70</line>
           <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/mqtt_client_test.go</url>
+          <line>42</line>
+          <option name="timeStamp" value="25" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

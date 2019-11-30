@@ -1,0 +1,17 @@
+{
+  "name": "r3inb",
+  "id": "1703422",
+  "ip": "192.168.5.55",
+  "localSensorInformation": [
+    {
+      "addr": 6,
+      "type": "flash",
+      "attach": "192.168.5.55"
+    },
+    {
+      "addr": 3,
+      "type": "flash",
+      "attach": "192.168.5.56"
+    }
+  ]
+}

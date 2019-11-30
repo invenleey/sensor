@@ -3,9 +3,13 @@ package sensor
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"math"
+	"os"
+	"regexp"
 	"strconv"
 )
 
@@ -133,3 +137,92 @@ func TwoByteToFloatX1000(v []byte) (float64, error) {
 func T() {
 
 }
+
+// ========================json-part-start===========================
+
+type LocalSensorInformation struct {
+	Addr   int    `json:"addr"`
+	Type   string `json:"type"`
+	Attach string `json:"attach"` // 传感器附着的透传设备
+}
+
+type LocalDeviceList struct {
+	Name                   string                   `json:"name"`
+	ID                     string                   `json:"id"`
+	IP                     string                   `json:"ip"` // 透传设备的ip
+	LocalSensorInformation []LocalSensorInformation `json:"localSensorInformation"`
+}
+
+// test
+func GetConfigTest() *LocalDeviceList {
+	config := LoadConfig("conf.json")
+	return config
+}
+
+const configFileSizeLimit = 10 << 20
+
+func LoadConfig(path string) *LocalDeviceList {
+	var config LocalDeviceList
+	config_file, err := os.Open(path)
+	if err != nil {
+		emit("Failed to open config file '%s': %s\n", path, err)
+		return &config
+	}
+
+	fi, _ := config_file.Stat()
+	if size := fi.Size(); size > (configFileSizeLimit) {
+		emit("config file (%q) size exceeds reasonable limit (%d) - aborting", path, size)
+		return &config
+	}
+
+	if fi.Size() == 0 {
+		emit("config file (%q) is empty, skipping", path)
+		return &config
+	}
+
+	buffer := make([]byte, fi.Size())
+	_, err = config_file.Read(buffer)
+	buffer, err = StripComments(buffer)
+	if err != nil {
+		emit("Failed to strip comments from json: %s\n", err)
+		return &config
+	}
+
+	buffer = []byte(os.ExpandEnv(string(buffer)))
+
+	err = json.Unmarshal(buffer, &config)
+	if err != nil {
+		emit("Failed unmarshalling json: %s\n", err)
+		return &config
+	}
+	return &config
+}
+
+// 注释清除
+func StripComments(data []byte) ([]byte, error) {
+	data = bytes.Replace(data, []byte("\r"), []byte(""), 0)
+	lines := bytes.Split(data, []byte("\n"))
+	filtered := make([][]byte, 0)
+
+	for _, line := range lines {
+		match, err := regexp.Match(`^\s*#`, line)
+		if err != nil {
+			return nil, err
+		}
+		if !match {
+			filtered = append(filtered, line)
+		}
+	}
+	return bytes.Join(filtered, []byte("\n")), nil
+}
+
+func emit(msg string, args ...interface{}) {
+	log.Printf(msg, args...)
+}
+
+// test
+func ResultConfig(test []map[string]interface{}) (port_password []map[string]interface{}) {
+	return
+}
+
+// ========================json-part-end===========================

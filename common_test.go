@@ -76,3 +76,8 @@ func TestByteToFloat(t *testing.T) {
 	v := []byte{0x1, 0x2}
 	fmt.Println(ByteToFloat(v))
 }
+
+//func TestReadDeviceList(t *testing.T) {
+//	entity := LoadConfig("conf.json")
+//	fmt.Println(entity)
+//}
