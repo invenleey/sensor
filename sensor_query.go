@@ -1,7 +1,12 @@
 package sensor
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
+	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -25,34 +30,140 @@ func (ls *LocalSensorInformation) StartSensorMeasureTask() {
 type TaskSensorKey struct {
 	Addr   int    // 设备地址
 	Attach string // 附着设备Gateway
-	Type   string // 指令类型
+	Type   byte   // 指令类型
+	// Interval int    // 最大间隔时间
 }
 
 type TaskSensorBody struct {
 	TaskSensorKey TaskSensorKey // 任务唯一id
-	Type          string        // 指令类型
+	Type          byte          // 指令类型
 }
 
 var tw *TimeWheel
 
-func sensorMeasureHandler(data TaskData) {
+const taskSecond int64 = 1000000000
+
+// 指令类型Type
+const DissolvedOxygenAndTemperature byte = 0x01
+const D2 byte = 0x02
+const D3 byte = 0x04
+const D4 byte = 0x08
+const D5 byte = 0x10
+const D6 byte = 0x20
+const D7 byte = 0x40
+const D8 byte = 0x80
+
+// ...
+// ...
+// ...
+
+/**
+ * 测量请求体创建
+ */
+func CreateMeasureRequest(r *http.Request) {
+	var sr []byte
+	// 设备ADDR
+	sr = append(sr, byte())
+	// 指令功能码
+	sr = append(sr, InfoMK["ReadFunc"]...)
+	// 寄存器地址和数量
+	sr = append(sr, InfoMK[reg]...)
+	// CRC_ModBus
+	sr = append(sr, CreateCRC(sr)...)
+	var rq RequestBody
+	rq.SData = sr
+	rq.NodeIP = r.Form["nodeIP"][0]
+	return rq, nil
+}
+
+/**
+ * 默认处理过程
+ * 当LocalSensorInformation没有设置handler时, 所调用的默认处理过程
+ * DefaultHandler中规定了几种默认的处理方式
+ */
+func sensorDefaultHandler(data TaskData) {
 	body := data["Data"].(TaskSensorBody)
 	fmt.Printf("[INFO] 设备地址 %d 任务类型 %s 施工中\n", body.TaskSensorKey.Addr, body.Type)
+
+	switch body.Type {
+	case DissolvedOxygenAndTemperature:
+		fmt.Println("溶氧量和温度查询过程")
+		// 得到透传conn
+		b, _ := GetDeviceSession(body.TaskSensorKey.Attach)
+		// 向传感器发送对应测量请求
+		p, err := b.MeasureRequest(rq.SData, []string{"测量值", "温度"})
+		if err == nil {
+			if bs, err := json.Marshal(p); err == nil {
+				_, err := w.Write(bs)
+				if err != nil {
+					log.Println("发送操作失败: ", err)
+				}
+			} else {
+				fmt.Println(err)
+			}
+		}
+		break
+	case D2:
+		fmt.Println("d2")
+		break
+	case D3:
+		fmt.Println("d3")
+		break
+	case D4:
+		fmt.Println("d4")
+		break
+	case D5:
+		fmt.Println("d5")
+		break
+	case D6:
+		fmt.Println("d6")
+		break
+	case D7:
+		fmt.Println("d7")
+		break
+	case D8:
+		fmt.Println("d8")
+		break
+	default:
+		fmt.Println("default")
+	}
+}
+
+/**
+ * 使用自定义Handler以代替默认处理过程
+ */
+func (ls *LocalSensorInformation) AddTaskHandler(callback Job) {
+	ls.TaskHandler = callback
+}
+
+/**
+ * 移除自定义Handler
+ */
+func (ls *LocalSensorInformation) RemoveTaskHandler() bool {
+	if ls.TaskHandler == nil {
+		return false
+	}
+	ls.TaskHandler = nil
+	return true
 }
 
 /**
  * 启动传感器任务
- * @param interval 测量间隔时间
- * @param times 任务次数
+ * @param ls.interval 测量间隔时间
+ * @param times 指定任务次数
  * -1 -> 无限次
  * >1 -> 有限次
  * @return error 错误的添加会触发
  */
-func (ls *LocalSensorInformation) CreateTask(interval time.Duration, times int) error {
+func (ls *LocalSensorInformation) CreateTask(times int) error {
 	key := TaskSensorKey{ls.Addr, ls.Attach, ls.Type}
 	body := TaskSensorBody{key, ls.Type}
 	data := TaskData{"Data": body}
-	return tw.AddTask(interval, times, key, data, sensorMeasureHandler)
+	if ls.TaskHandler == nil {
+		return tw.AddTask(time.Duration(ls.Interval*taskSecond), times, key, data, sensorDefaultHandler)
+	} else {
+		return tw.AddTask(time.Duration(ls.Interval*taskSecond), times, key, data, ls.TaskHandler)
+	}
 }
 
 /**
@@ -77,11 +188,18 @@ func (ls *LocalSensorInformation) UpdateTask(interval time.Duration) error {
 	return tw.UpdateTask(key, interval, data)
 }
 
-func TimeWheelInit() {
+/**
+ * 初始化
+ */
+func TimeWheelInit() *TimeWheel {
 	tw = New(time.Second, 180)
 	tw.Start()
+	return tw
 }
 
+/*
+ * 获得
+ */
 func GetTimeWheel() *TimeWheel {
 	return tw
 }

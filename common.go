@@ -141,19 +141,23 @@ func T() {
 // ========================json-part-start===========================
 
 type LocalSensorInformation struct {
-	Addr   int    `json:"addr"`
-	Type   string `json:"type"`
-	Attach string `json:"attach"` // 传感器附着的透传设备
+	// ==========OPTIONS============
+	TaskHandler Job // 自定义传感器任务
+	// ==========文件相关============
+	Addr     int    `json:"addr"`     // 传感器设备地址
+	Type     byte   `json:"type"`     // 传感器类型
+	Attach   string `json:"attach"`   // 传感器附着的透传设备
+	Interval int64  `json:"interval"` // 最大间隔时间(秒)
 }
 
 type LocalDeviceList struct {
-	Name                   string                   `json:"name"`
-	ID                     string                   `json:"id"`
-	IP                     string                   `json:"ip"` // 透传设备的ip
-	LocalSensorInformation []LocalSensorInformation `json:"localSensorInformation"`
+	Name                   string                   `json:"name"`                   // 透传设备名称
+	ID                     string                   `json:"id"`                     // 透传设备地址
+	IP                     string                   `json:"ip"`                     // 透传设备IP
+	LocalSensorInformation []LocalSensorInformation `json:"localSensorInformation"` // 传感器集合
 }
 
-// test
+// default
 func GetConfigTest() *LocalDeviceList {
 	config := LoadConfig("conf.json")
 	return config
@@ -163,13 +167,13 @@ const configFileSizeLimit = 10 << 20
 
 func LoadConfig(path string) *LocalDeviceList {
 	var config LocalDeviceList
-	config_file, err := os.Open(path)
+	configFile, err := os.Open(path)
 	if err != nil {
 		emit("Failed to open config file '%s': %s\n", path, err)
 		return &config
 	}
 
-	fi, _ := config_file.Stat()
+	fi, _ := configFile.Stat()
 	if size := fi.Size(); size > (configFileSizeLimit) {
 		emit("config file (%q) size exceeds reasonable limit (%d) - aborting", path, size)
 		return &config
@@ -181,7 +185,7 @@ func LoadConfig(path string) *LocalDeviceList {
 	}
 
 	buffer := make([]byte, fi.Size())
-	_, err = config_file.Read(buffer)
+	_, err = configFile.Read(buffer)
 	buffer, err = StripComments(buffer)
 	if err != nil {
 		emit("Failed to strip comments from json: %s\n", err)
