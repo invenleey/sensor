@@ -10,8 +10,8 @@
     },
     {
       "addr": 3,
-      "type": "flash",
-      "attach": "192.168.5.56"
+      "type": "grip",
+      "attach": "192.168.5.55"
     }
   ]
 }

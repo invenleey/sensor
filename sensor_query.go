@@ -1,6 +1,9 @@
 package sensor
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 /**
  * which attached to the device ips
@@ -33,7 +36,8 @@ type TaskSensorBody struct {
 var tw *TimeWheel
 
 func sensorMeasureHandler(data TaskData) {
-
+	body := data["Data"].(TaskSensorBody)
+	fmt.Printf("[INFO] 设备地址 %d 任务类型 %s 施工中\n", body.TaskSensorKey.Addr, body.Type)
 }
 
 /**
@@ -78,6 +82,6 @@ func TimeWheelInit() {
 	tw.Start()
 }
 
-func GetTimeWheel() *TimeWheel{
+func GetTimeWheel() *TimeWheel {
 	return tw
 }

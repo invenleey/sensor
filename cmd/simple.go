@@ -13,10 +13,13 @@ import (
 func main() {
 	list := sensor.LoadConfig("cnf/conf.json")
 	fmt.Println(list)
-	for _, v := range list.GetLocalSensorList("192.168.1.1") {
-		if err := v.CreateTask(time.Minute, -1); err != nil {
+	sensor.TimeWheelInit()
+	for _, v := range list.GetLocalSensorList("192.168.5.55") {
+		if err := v.CreateTask(time.Second*5, -1); err != nil {
 			continue
 		}
 		fmt.Println("[INFO] 添加一个新的测量任务")
 	}
+
+	time.Sleep(time.Minute * 3)
 }
