@@ -2,11 +2,7 @@ package sensor
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"log"
-	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -28,7 +24,7 @@ func (ls *LocalSensorInformation) StartSensorMeasureTask() {
 }
 
 type TaskSensorKey struct {
-	Addr   int    // 设备地址
+	Addr   byte   // 设备地址
 	Attach string // 附着设备Gateway
 	Type   byte   // 指令类型
 	// Interval int    // 最大间隔时间
@@ -37,6 +33,7 @@ type TaskSensorKey struct {
 type TaskSensorBody struct {
 	TaskSensorKey TaskSensorKey // 任务唯一id
 	Type          byte          // 指令类型
+	RequestData   []byte        // 生成的指令数据
 }
 
 var tw *TimeWheel
@@ -60,20 +57,17 @@ const D8 byte = 0x80
 /**
  * 测量请求体创建
  */
-func CreateMeasureRequest(r *http.Request) {
+func (ts *TaskSensorBody) CreateMeasureRequest() {
 	var sr []byte
 	// 设备ADDR
-	sr = append(sr, byte())
+	sr = append(sr, ts.TaskSensorKey.Addr)
 	// 指令功能码
 	sr = append(sr, InfoMK["ReadFunc"]...)
 	// 寄存器地址和数量
-	sr = append(sr, InfoMK[reg]...)
+	sr = append(sr, InfoMK["RMeasure"]...)
 	// CRC_ModBus
 	sr = append(sr, CreateCRC(sr)...)
-	var rq RequestBody
-	rq.SData = sr
-	rq.NodeIP = r.Form["nodeIP"][0]
-	return rq, nil
+	ts.RequestData = sr
 }
 
 /**
@@ -83,25 +77,27 @@ func CreateMeasureRequest(r *http.Request) {
  */
 func sensorDefaultHandler(data TaskData) {
 	body := data["Data"].(TaskSensorBody)
-	fmt.Printf("[INFO] 设备地址 %d 任务类型 %s 施工中\n", body.TaskSensorKey.Addr, body.Type)
+	fmt.Printf("[INFO] 设备地址 %d 任务类型 %d 施工中\n", body.TaskSensorKey.Addr, body.Type)
 
 	switch body.Type {
 	case DissolvedOxygenAndTemperature:
 		fmt.Println("溶氧量和温度查询过程")
 		// 得到透传conn
 		b, _ := GetDeviceSession(body.TaskSensorKey.Attach)
+		// 合成地址
+		body.CreateMeasureRequest()
+		fmt.Println(body.RequestData)
 		// 向传感器发送对应测量请求
-		p, err := b.MeasureRequest(rq.SData, []string{"测量值", "温度"})
-		if err == nil {
-			if bs, err := json.Marshal(p); err == nil {
-				_, err := w.Write(bs)
-				if err != nil {
-					log.Println("发送操作失败: ", err)
-				}
-			} else {
-				fmt.Println(err)
-			}
+		p, err := b.MeasureRequest(body.RequestData, []string{"测量值", "温度"})
+		// fmt.Println(body.RequestData)
+		//p, err = b.MeasureRequest(body.RequestData, []string{"aas", "bbs"})
+		if err != nil {
+			fmt.Println("[FAIL] 请求失败")
+			fmt.Println(err)
 		}
+		send, err := json.Marshal(p)
+		client, _ := GetMQTTInstance()
+		client.Publish("sensor/oxygen/measure", 1, false, send)
 		break
 	case D2:
 		fmt.Println("d2")
@@ -157,7 +153,7 @@ func (ls *LocalSensorInformation) RemoveTaskHandler() bool {
  */
 func (ls *LocalSensorInformation) CreateTask(times int) error {
 	key := TaskSensorKey{ls.Addr, ls.Attach, ls.Type}
-	body := TaskSensorBody{key, ls.Type}
+	body := TaskSensorBody{key, ls.Type, nil}
 	data := TaskData{"Data": body}
 	if ls.TaskHandler == nil {
 		return tw.AddTask(time.Duration(ls.Interval*taskSecond), times, key, data, sensorDefaultHandler)
@@ -183,7 +179,7 @@ func (ls *LocalSensorInformation) RemoveTask() error {
  */
 func (ls *LocalSensorInformation) UpdateTask(interval time.Duration) error {
 	key := TaskSensorKey{ls.Addr, ls.Attach, ls.Type}
-	body := TaskSensorBody{key, ls.Type}
+	body := TaskSensorBody{key, ls.Type, nil}
 	data := TaskData{"Data": body}
 	return tw.UpdateTask(key, interval, data)
 }

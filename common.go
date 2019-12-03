@@ -144,7 +144,7 @@ type LocalSensorInformation struct {
 	// ==========OPTIONS============
 	TaskHandler Job // 自定义传感器任务
 	// ==========文件相关============
-	Addr     int    `json:"addr"`     // 传感器设备地址
+	Addr     byte   `json:"addr"`     // 传感器设备地址
 	Type     byte   `json:"type"`     // 传感器类型
 	Attach   string `json:"attach"`   // 传感器附着的透传设备
 	Interval int64  `json:"interval"` // 最大间隔时间(秒)

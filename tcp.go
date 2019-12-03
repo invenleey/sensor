@@ -7,7 +7,7 @@ import (
 
 const (
 	Network = "tcp"
-	Address = ":1080"
+	Address = ":6564"
 )
 
 func RunDeviceTCP() {

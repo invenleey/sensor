@@ -7,7 +7,9 @@
       <change beforePath="$PROJECT_DIR$/cnf/conf.json" beforeDir="false" afterPath="$PROJECT_DIR$/cnf/conf.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/common.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mqtt_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/mqtt_client.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sensor_query.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensor_query.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tcp.go" beforeDir="false" afterPath="$PROJECT_DIR$/tcp.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -106,7 +108,7 @@
       <pattern value="^TestGetMQTTInstance$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestOpenKit in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestOpenKit in sensor (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="sensor" />
       <working_directory value="$PROJECT_DIR$" />
       <framework value="gotest" />
@@ -131,10 +133,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Go Build.go build sensor/cmd" />
+        <item itemvalue="Go Test.TestOpenKit in sensor (1)" />
         <item itemvalue="Go Test.TestReadDeviceList in sensor" />
         <item itemvalue="Go Test.TestGetInformation in sensor" />
         <item itemvalue="Go Test.TestGetMQTTInstance in sensor" />
-        <item itemvalue="Go Test.TestOpenKit in sensor" />
       </list>
     </recent_temporary>
   </component>
@@ -185,6 +187,16 @@
           <url>file://$PROJECT_DIR$/mqtt_client_test.go</url>
           <line>42</line>
           <option name="timeStamp" value="25" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/sensor_query.go</url>
+          <line>98</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/mqtt_client.go</url>
+          <line>48</line>
+          <option name="timeStamp" value="30" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
