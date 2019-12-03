@@ -148,6 +148,7 @@ type LocalSensorInformation struct {
 	Type     byte   `json:"type"`     // 传感器类型
 	Attach   string `json:"attach"`   // 传感器附着的透传设备
 	Interval int64  `json:"interval"` // 最大间隔时间(秒)
+	SensorID string `json:"sensor"`   // 传感器ID
 }
 
 type LocalDeviceList struct {

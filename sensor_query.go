@@ -34,6 +34,7 @@ type TaskSensorBody struct {
 	TaskSensorKey TaskSensorKey // 任务唯一id
 	Type          byte          // 指令类型
 	RequestData   []byte        // 生成的指令数据
+	SensorID      string        // 传感器ID
 }
 
 var tw *TimeWheel
@@ -89,12 +90,11 @@ func sensorDefaultHandler(data TaskData) {
 		fmt.Println(body.RequestData)
 		// 向传感器发送对应测量请求
 		p, err := b.MeasureRequest(body.RequestData, []string{"测量值", "温度"})
-		// fmt.Println(body.RequestData)
-		//p, err = b.MeasureRequest(body.RequestData, []string{"aas", "bbs"})
 		if err != nil {
 			fmt.Println("[FAIL] 请求失败")
-			fmt.Println(err)
+			return
 		}
+		p.SensorID = body.SensorID
 		send, err := json.Marshal(p)
 		client, _ := GetMQTTInstance()
 		client.Publish("sensor/oxygen/measure", 1, false, send)
@@ -153,7 +153,7 @@ func (ls *LocalSensorInformation) RemoveTaskHandler() bool {
  */
 func (ls *LocalSensorInformation) CreateTask(times int) error {
 	key := TaskSensorKey{ls.Addr, ls.Attach, ls.Type}
-	body := TaskSensorBody{key, ls.Type, nil}
+	body := TaskSensorBody{key, ls.Type, nil, ls.SensorID}
 	data := TaskData{"Data": body}
 	if ls.TaskHandler == nil {
 		return tw.AddTask(time.Duration(ls.Interval*taskSecond), times, key, data, sensorDefaultHandler)
@@ -179,7 +179,7 @@ func (ls *LocalSensorInformation) RemoveTask() error {
  */
 func (ls *LocalSensorInformation) UpdateTask(interval time.Duration) error {
 	key := TaskSensorKey{ls.Addr, ls.Attach, ls.Type}
-	body := TaskSensorBody{key, ls.Type, nil}
+	body := TaskSensorBody{key, ls.Type, nil, ls.SensorID}
 	data := TaskData{"Data": body}
 	return tw.UpdateTask(key, interval, data)
 }

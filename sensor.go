@@ -153,6 +153,7 @@ func ConfigRequest(id bson.ObjectId, funcCode []byte, callback func(meta interfa
  * the measure values struct
  */
 type ReadResult struct {
+	SensorID string `json:"sensorID"`
 	// unique DeviceID in node server
 	DeviceAddr byte `json:"deviceAddr"`
 	// Function Code which had been operate
@@ -179,7 +180,7 @@ type ReadResult struct {
 
 type MeasureItem struct {
 	Name  string  `json:"name"`
-	Value float64  `json:"value"`
+	Value float64 `json:"value"`
 }
 
 /**
@@ -260,5 +261,3 @@ func (mr *ReadResult) DecodeOrder(data []byte) error {
 	mr.WriteReg = data[:2]
 	return nil
 }
-
-
