@@ -23,7 +23,7 @@ func main() {
 	fmt.Println(list)
 	// 初始化
 	sensor.TimeWheelInit()
-	for _, v := range list.GetLocalSensorList("172.20.10.4") {
+	for _, v := range list.GetLocalSensorList("192.168.5.55") {
 
 		if err := v.CreateTask(-1); err != nil {
 			continue

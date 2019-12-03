@@ -2,6 +2,7 @@ package sensor
 
 import (
 	"github.com/eclipse/paho.mqtt.golang"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // ws/ssl/tcp
@@ -10,7 +11,7 @@ var host = "106.13.79.157"
 var port = "1883"
 
 // ClientID 随机acm0-bjd2-fdi1-am81
-var ClientID = "device0"
+var ClientID = bson.NewObjectId().String()
 var Username = "r3inb"
 var Password = "159463"
 

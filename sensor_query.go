@@ -90,6 +90,7 @@ func sensorDefaultHandler(data TaskData) {
 		fmt.Println(body.RequestData)
 		// 向传感器发送对应测量请求
 		p, err := b.MeasureRequest(body.RequestData, []string{"测量值", "温度"})
+		p, err = b.MeasureRequest(body.RequestData, []string{"测量值", "温度"})
 		if err != nil {
 			fmt.Println("[FAIL] 请求失败")
 			return

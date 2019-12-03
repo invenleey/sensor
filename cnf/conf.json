@@ -5,14 +5,16 @@
   "localSensorInformation": [
     {
       "addr": 6,
+      "sensorID": "7eb220dd-6127-58c7-8663-bf2f55371b78",
       "type": 1,
-      "attach": "172.20.10.4",
-      "interval": 15
+      "attach": "192.168.5.55",
+      "interval": 5
     },
     {
       "addr": 3,
-      "type": 16,
-      "attach": "192.168.50.50",
+      "sensorID": "aec66d1a-c39a-5a9d-91bf-ad41154069fc",
+      "type": 1,
+      "attach": "192.168.5.58",
       "interval": 5
     }
   ]
