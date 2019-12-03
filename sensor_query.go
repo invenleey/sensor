@@ -82,7 +82,7 @@ func sensorDefaultHandler(data TaskData) {
 
 	switch body.Type {
 	case DissolvedOxygenAndTemperature:
-		fmt.Println("溶氧量和温度查询过程")
+		fmt.Println("溶氧量和温度过程")
 		// 得到透传conn
 		b, _ := GetDeviceSession(body.TaskSensorKey.Attach)
 		// 合成地址
@@ -90,7 +90,6 @@ func sensorDefaultHandler(data TaskData) {
 		fmt.Println(body.RequestData)
 		// 向传感器发送对应测量请求
 		p, err := b.MeasureRequest(body.RequestData, []string{"测量值", "温度"})
-		p, err = b.MeasureRequest(body.RequestData, []string{"测量值", "温度"})
 		if err != nil {
 			fmt.Println("[FAIL] 请求失败")
 			return
@@ -101,24 +100,31 @@ func sensorDefaultHandler(data TaskData) {
 		client.Publish("sensor/oxygen/measure", 1, false, send)
 		break
 	case D2:
+		// TODO
 		fmt.Println("d2")
 		break
 	case D3:
+		// TODO
 		fmt.Println("d3")
 		break
 	case D4:
+		// TODO
 		fmt.Println("d4")
 		break
 	case D5:
+		// TODO
 		fmt.Println("d5")
 		break
 	case D6:
+		// TODO
 		fmt.Println("d6")
 		break
 	case D7:
+		// TODO
 		fmt.Println("d7")
 		break
 	case D8:
+		// TODO
 		fmt.Println("d8")
 		break
 	default:
