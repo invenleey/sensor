@@ -5,9 +5,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmd/simple.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/simple.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cnf/conf.json" beforeDir="false" afterPath="$PROJECT_DIR$/cnf/conf.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/common.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mqtt_client.go" beforeDir="false" afterPath="$PROJECT_DIR$/mqtt_client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensor_query.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensor_query.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -36,7 +33,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="C:/Program Files/Go" />
+  <component name="GOROOT" path="C:\Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
