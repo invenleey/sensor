@@ -7,8 +7,8 @@
       "addr": 6,
       "sensorID": "7eb220dd-6127-58c7-8663-bf2f55371b78",
       "type": 1,
-      "attach": "192.168.50.52",
-      "interval": 5
+      "attach": "192.168.50.200",
+      "interval": 10
     },
     {
       "addr": 3,

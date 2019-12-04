@@ -23,12 +23,15 @@ func main() {
 	fmt.Println(list)
 	// 初始化
 	sensor.TimeWheelInit()
-	for _, v := range list.GetLocalSensorList("192.168.50.52") {
+	ips := sensor.ShowNodeIPs()
+	for _, ip := range ips {
+		for _, v := range list.GetLocalSensorList(ip) {
 
-		if err := v.CreateTask(-1); err != nil {
-			continue
+			if err := v.CreateTask(-1); err != nil {
+				continue
+			}
+			fmt.Printf("[INFO] ID:%s 进入队列", v.SensorID)
 		}
-		fmt.Println("[INFO] DEMO 添加一个新的测量任务")
 	}
 
 	ins, _ := sensor.GetMQTTInstance()
