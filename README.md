@@ -82,3 +82,7 @@ rabbitmq-plugins enable rabbitmq_mqtt
 | 函数名 | 描述                    |  返回值 |
 | ---------------------- | ------------------------------ |----------------------|
 | `CreateMeasureRequest()`| 创建测量请求数据 |  |
+
+未完成
+w
+ww
