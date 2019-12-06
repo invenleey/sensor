@@ -8,44 +8,22 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"sensor"
-	"time"
 )
 
 func main() {
-	// TCP server
+	// 初始化任务轮盘
+	sensor.TimeWheelInit()
+
+	// 服务开启示例
+	// 下级: GO -> DTU -> Sensor
 	go sensor.RunDeviceTCP()
 
-	// 暂停等待测试
-	time.Sleep(time.Second * 10)
-
-	// 读取配置
-	list := sensor.LoadConfig("cnf/conf.json")
-	fmt.Println(list)
-	// 初始化
-	sensor.TimeWheelInit()
-	ips := sensor.ShowNodeIPs()
-	for _, ip := range ips {
-		ch := make(chan sensor.TaskSensorBody, 10)
-		go sensor.TaskSensorPop(ch)
-		for _, v := range list.GetLocalSensorList(ip) {
-
-			if err := v.CreateTask(-1, ch); err != nil {
-				continue
-			}
-			fmt.Printf("[INFO] ID:%s 进入队列\n", v.SensorID)
-		}
-	}
-
-	ins, _ := sensor.GetMQTTInstance()
-	if token := ins.Subscribe("sensor/oxygen/measure", 1, f); token.Wait() && token.Error() != nil {
-		fmt.Println(token.Error())
-	}
-	time.Sleep(time.Minute * 3)
-}
-
-
-
-var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	fmt.Printf("TOPIC: %s\n", msg.Topic())
-	fmt.Printf("MSG: %s\n", msg.Payload())
+	// 订阅示例
+	// 上级: GO -> MQTT
+	sensor.MQTTMapping("sensor/oxygen/measure", 1,
+		func(client mqtt.Client, msg mqtt.Message) {
+			fmt.Printf("主题: %s\n", msg.Topic())
+			fmt.Printf("信息: %s\n", msg.Payload())
+		})
+	select {}
 }

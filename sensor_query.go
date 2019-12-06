@@ -83,17 +83,16 @@ func SensorDefaultHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 
 	switch body.Type {
 	case DissolvedOxygenAndTemperature:
-		fmt.Println("溶氧量和温度过程")
 		// 得到透传conn
 		b, _ := GetDeviceSession(body.TaskSensorKey.Attach)
 		// 合成地址
 		body.CreateMeasureRequest()
-		fmt.Printf("[INFO] 测量请求 -> 传感器设备ID %s | 设备地址 %d | 任务类型 %d | 请求数据 %s \n |", body.SensorID, body.TaskSensorKey.Addr, body.Type, body.RequestData)
+		fmt.Printf("[INFO] 测量请求 -> 传感器设备ID %s | 设备地址 %d | 任务类型 %d | 请求数据 %b |\n", body.SensorID, body.TaskSensorKey.Addr, body.Type, body.RequestData)
 		// 向传感器发送对应测量请求
 		p, err := b.MeasureRequest(body.RequestData, []string{"Oxygen", "Temp"})
 		if err != nil {
 			fmt.Println("[FAIL] 请求失败")
-			// TODO 当DTU没有响应请求时, 决定是否要结束
+			// TODO 当DTU没有接受到传感器响应时, 决定是否要结束
 			return
 		}
 		p.SensorID = body.SensorID
@@ -252,4 +251,15 @@ func TimeWheelInit() *TimeWheel {
  */
 func GetTimeWheel() *TimeWheel {
 	return tw
+}
+
+func TaskSetup(ip string) {
+	ch := make(chan TaskSensorBody, 10)
+	go TaskSensorPop(ch)
+	for _, v := range GetLocalDevices().GetLocalSensorList(ip) {
+		if err := v.CreateTask(-1, ch); err != nil {
+			continue
+		}
+		fmt.Printf("[INFO] ID:%s 进入队列\n", v.SensorID)
+	}
 }

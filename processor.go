@@ -3,6 +3,7 @@ package sensor
 import (
 	"fmt"
 	"net"
+	"strings"
 )
 
 func HandleProcessor(conn net.Conn) {
@@ -10,17 +11,16 @@ func HandleProcessor(conn net.Conn) {
 	defer conn.Close()
 	// session
 	b := RegDeviceSession(conn)
+	// setup time wheel
+	TaskSetup(strings.Split(conn.RemoteAddr().String(), ":")[0])
+
 	go b.ReadConn()
 	go b.WriteConn()
 	// go b.HeartBeating(20)
 
-	// CMD
-
-	fmt.Println("already connected:", ShowNodeIPs())
+	// fmt.Println("already connected:", ShowNodeIPs())
 
 	// testing
-
-
 	//
 	//go b.SendWord([]byte{0x01}, func(meta DeviceMeta, data []byte) {
 	//	fmt.Println(data)

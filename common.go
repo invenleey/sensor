@@ -149,7 +149,7 @@ type LocalSensorInformation struct {
 	Type     byte   `json:"type"`     // 传感器类型
 	Attach   string `json:"attach"`   // 传感器附着的透传设备
 	Interval int64  `json:"interval"` // 最大间隔时间(秒)
-	SensorID string `json:"sensorID"`   // 传感器ID
+	SensorID string `json:"sensorID"` // 传感器ID
 }
 
 type LocalDeviceList struct {
@@ -161,8 +161,19 @@ type LocalDeviceList struct {
 
 // default
 func GetConfigTest() *LocalDeviceList {
-	config := LoadConfig("conf.json")
+	config := LoadConfig("cnf/conf.json")
 	return config
+}
+
+var localDeviceList *LocalDeviceList = nil
+
+func GetLocalDevices() *LocalDeviceList {
+	if localDeviceList == nil {
+		localDeviceList = GetConfigTest()
+		return localDeviceList
+	} else {
+		return localDeviceList
+	}
 }
 
 const configFileSizeLimit = 10 << 20

@@ -23,7 +23,7 @@ func RunDeviceTCP() {
 		if err != nil {
 			fmt.Println("[错误]", err)
 			return
-	}
+		}
 		go HandleProcessor(conn)
 	}
 }
