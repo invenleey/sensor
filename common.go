@@ -11,6 +11,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"sync"
 )
 
 /**
@@ -142,7 +143,7 @@ func T() {
 
 type LocalSensorInformation struct {
 	// ==========OPTIONS============
-	TaskHandler Job // 自定义传感器任务
+	TaskHandler func(body TaskSensorBody, wg *sync.WaitGroup) // 自定义传感器任务
 	// ==========文件相关============
 	Addr     byte   `json:"addr"`     // 传感器设备地址
 	Type     byte   `json:"type"`     // 传感器类型

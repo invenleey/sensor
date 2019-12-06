@@ -3,6 +3,7 @@ package sensor
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 	"time"
 )
 
@@ -27,7 +28,7 @@ type TaskSensorKey struct {
 	Addr   byte   // 设备地址
 	Attach string // 附着设备Gateway
 	Type   byte   // 指令类型
-	// Interval int    // 最大间隔时间
+	// Interval int    // 最小间隔时间(如果测量没有被阻塞的话将会接近的最小间隔时间, 阻塞的原因可能归结于透传设备无法响应请求指令)
 }
 
 type TaskSensorBody struct {
@@ -35,6 +36,8 @@ type TaskSensorBody struct {
 	Type          byte          // 指令类型
 	RequestData   []byte        // 生成的指令数据
 	SensorID      string        // 传感器ID
+
+	customFunction func(body TaskSensorBody, wg *sync.WaitGroup)
 }
 
 var tw *TimeWheel
@@ -42,16 +45,16 @@ var tw *TimeWheel
 const taskSecond int64 = 1000000000
 
 // 指令类型Type
-const DissolvedOxygenAndTemperature byte = 0x01
-const D2 byte = 0x02
-const D3 byte = 0x04
-const D4 byte = 0x08
-const D5 byte = 0x10
-const D6 byte = 0x20
-const D7 byte = 0x40
-const D8 byte = 0x80
+const DissolvedOxygenAndTemperature byte = 0x01 // 溶氧量和温度
+const D2 byte = 0x02                            // 未定义的类型
+const D3 byte = 0x04                            // ..
+const D4 byte = 0x08                            // ..
+const D5 byte = 0x10                            // ..
+const D6 byte = 0x20                            // ..
+const D7 byte = 0x40                            // ..
+const D8 byte = 0x80                            // 未定义的类型
 
-// ...
+// enum
 // ...
 // ...
 
@@ -76,9 +79,7 @@ func (ts *TaskSensorBody) CreateMeasureRequest() {
  * 当LocalSensorInformation没有设置handler时, 所调用的默认处理过程
  * DefaultHandler中规定了几种默认的处理方式
  */
-func sensorDefaultHandler(data TaskData) {
-	body := data["Data"].(TaskSensorBody)
-	fmt.Printf("[INFO] 设备地址 %d 任务类型 %d 施工中\n", body.TaskSensorKey.Addr, body.Type)
+func SensorDefaultHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 
 	switch body.Type {
 	case DissolvedOxygenAndTemperature:
@@ -87,11 +88,12 @@ func sensorDefaultHandler(data TaskData) {
 		b, _ := GetDeviceSession(body.TaskSensorKey.Attach)
 		// 合成地址
 		body.CreateMeasureRequest()
-		fmt.Println(body.RequestData)
+		fmt.Printf("[INFO] 测量请求 -> 传感器设备ID %s | 设备地址 %d | 任务类型 %d | 请求数据 %s \n |", body.SensorID, body.TaskSensorKey.Addr, body.Type, body.RequestData)
 		// 向传感器发送对应测量请求
 		p, err := b.MeasureRequest(body.RequestData, []string{"Oxygen", "Temp"})
 		if err != nil {
 			fmt.Println("[FAIL] 请求失败")
+			// TODO 当DTU没有响应请求时, 决定是否要结束
 			return
 		}
 		p.SensorID = body.SensorID
@@ -130,12 +132,13 @@ func sensorDefaultHandler(data TaskData) {
 	default:
 		fmt.Println("default")
 	}
+	wg.Done()
 }
 
 /**
  * 使用自定义Handler以代替默认处理过程
  */
-func (ls *LocalSensorInformation) AddTaskHandler(callback Job) {
+func (ls *LocalSensorInformation) AddTaskHandler(callback func(body TaskSensorBody, wg *sync.WaitGroup)) {
 	ls.TaskHandler = callback
 }
 
@@ -154,18 +157,53 @@ func (ls *LocalSensorInformation) RemoveTaskHandler() bool {
  * 启动传感器任务
  * @param ls.interval 测量间隔时间
  * @param times 指定任务次数
+ * @param queueChannel 单DTU内任务的阻塞队列
  * -1 -> 无限次
  * >1 -> 有限次
  * @return error 错误的添加会触发
  */
-func (ls *LocalSensorInformation) CreateTask(times int) error {
+func (ls *LocalSensorInformation) CreateTask(times int, queueChannel chan TaskSensorBody) error {
 	key := TaskSensorKey{ls.Addr, ls.Attach, ls.Type}
-	body := TaskSensorBody{key, ls.Type, nil, ls.SensorID}
-	data := TaskData{"Data": body}
+
+	body := TaskSensorBody{}
+	body.TaskSensorKey = key
+	body.Type = ls.Type
+	body.RequestData = nil
+	body.SensorID = ls.SensorID
 	if ls.TaskHandler == nil {
-		return tw.AddTask(time.Duration(ls.Interval*taskSecond), times, key, data, sensorDefaultHandler)
+		body.customFunction = nil
 	} else {
-		return tw.AddTask(time.Duration(ls.Interval*taskSecond), times, key, data, ls.TaskHandler)
+		body.customFunction = ls.TaskHandler
+	}
+	data := TaskData{"Data": body, "Channel": queueChannel}
+	return tw.AddTask(time.Duration(ls.Interval*taskSecond), times, key, data, TaskSensorPush)
+}
+
+/**
+ * 单DTU任务阻塞队列的压入回调
+ * @param queueChannel 单DTU内任务的阻塞队列
+ */
+func TaskSensorPush(data TaskData) {
+	body := data["Data"].(TaskSensorBody)
+	queueChannel := data["Channel"].(chan TaskSensorBody)
+	queueChannel <- body
+}
+
+/**
+ * 单DTU任务调度Routine
+ * @param queueChannel 单DTU内任务的阻塞队列
+ */
+func TaskSensorPop(queueChannel chan TaskSensorBody) {
+	var wg sync.WaitGroup
+	for {
+		v, ok := <-queueChannel
+		if !ok {
+			break
+		} else {
+			wg.Add(1)
+			SensorDefaultHandler(v, &wg)
+			wg.Wait()
+		}
 	}
 }
 
@@ -184,15 +222,24 @@ func (ls *LocalSensorInformation) RemoveTask() error {
  * @return error 需要注意多次提交相同key任务时会触发
  *
  */
-func (ls *LocalSensorInformation) UpdateTask(interval time.Duration) error {
+func (ls *LocalSensorInformation) UpdateTask(interval time.Duration, queueChannel chan TaskSensorBody) error {
 	key := TaskSensorKey{ls.Addr, ls.Attach, ls.Type}
-	body := TaskSensorBody{key, ls.Type, nil, ls.SensorID}
-	data := TaskData{"Data": body}
+	body := TaskSensorBody{}
+	body.TaskSensorKey = key
+	body.Type = ls.Type
+	body.RequestData = nil
+	body.SensorID = ls.SensorID
+	if ls.TaskHandler == nil {
+		body.customFunction = nil
+	} else {
+		body.customFunction = ls.TaskHandler
+	}
+	data := TaskData{"Data": body, "Channel": queueChannel}
 	return tw.UpdateTask(key, interval, data)
 }
 
 /**
- * 初始化
+ * 初始化TimeWheel
  */
 func TimeWheelInit() *TimeWheel {
 	tw = New(time.Second, 180)
@@ -201,7 +248,7 @@ func TimeWheelInit() *TimeWheel {
 }
 
 /*
- * 获得
+ * 获得TimeWheel指针
  */
 func GetTimeWheel() *TimeWheel {
 	return tw

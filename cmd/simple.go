@@ -25,12 +25,14 @@ func main() {
 	sensor.TimeWheelInit()
 	ips := sensor.ShowNodeIPs()
 	for _, ip := range ips {
+		ch := make(chan sensor.TaskSensorBody, 10)
+		go sensor.TaskSensorPop(ch)
 		for _, v := range list.GetLocalSensorList(ip) {
 
-			if err := v.CreateTask(-1); err != nil {
+			if err := v.CreateTask(-1, ch); err != nil {
 				continue
 			}
-			fmt.Printf("[INFO] ID:%s 进入队列", v.SensorID)
+			fmt.Printf("[INFO] ID:%s 进入队列\n", v.SensorID)
 		}
 	}
 
@@ -40,6 +42,8 @@ func main() {
 	}
 	time.Sleep(time.Minute * 3)
 }
+
+
 
 var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	fmt.Printf("TOPIC: %s\n", msg.Topic())
