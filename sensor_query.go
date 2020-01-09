@@ -256,6 +256,8 @@ func GetTimeWheel() *TimeWheel {
 func TaskSetup(ip string) {
 	ch := make(chan TaskSensorBody, 10)
 	go TaskSensorPop(ch)
+	// 此处得到attach到该dtu的至少0个, 至多3个传感器的参数
+	// TODO: 重构1 初始化传感器状态
 	for _, v := range GetLocalDevices().GetLocalSensorList(ip) {
 		if err := v.CreateTask(-1, ch); err != nil {
 			continue
