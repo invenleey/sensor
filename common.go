@@ -177,7 +177,7 @@ func GetConfigTest() *LocalDeviceDetail {
 var localDeviceDetail *LocalDeviceDetail = nil
 
 // 加载参数
-func GetLocalDevices() *LocalDeviceDetail {
+func GetLocalDevicesInstance() *LocalDeviceDetail {
 	if localDeviceDetail == nil {
 		localDeviceDetail = GetConfigTest()
 		return localDeviceDetail

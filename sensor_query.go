@@ -8,7 +8,7 @@ import (
 )
 
 /**
- * which attached to the device ips
+ * @return 关联至attachIP上的至少0个传感器
  */
 func (dl *LocalDeviceDetail) GetLocalSensorList(attachIP string) []LocalSensorInformation {
 	var ret []LocalSensorInformation
@@ -32,10 +32,12 @@ type TaskSensorKey struct {
 }
 
 type TaskSensorBody struct {
-	TaskSensorKey TaskSensorKey // 任务唯一id
-	Type          byte          // 指令类型
-	RequestData   []byte        // 生成的指令数据
-	SensorID      string        // 传感器ID
+	// TaskSensorKey TaskSensorKey // 任务唯一id
+	Type           byte   // 指令类型
+	RequestData    []byte // 生成的指令数据
+	SensorID       string // 传感器ID
+	SensorAddr     byte   // 传感器地址
+	SensorAttachIP string // 传感器依附IP
 
 	customFunction func(body TaskSensorBody, wg *sync.WaitGroup)
 }
@@ -53,6 +55,7 @@ const D5 byte = 0x10                            // ..
 const D6 byte = 0x20                            // ..
 const D7 byte = 0x40                            // ..
 const D8 byte = 0x80                            // 未定义的类型
+// 自定义指令Type 用于一次性的用户设置指令等
 
 // enum
 // ...
@@ -64,7 +67,7 @@ const D8 byte = 0x80                            // 未定义的类型
 func (ts *TaskSensorBody) CreateMeasureRequest() {
 	var sr []byte
 	// 设备ADDR
-	sr = append(sr, ts.TaskSensorKey.Addr)
+	sr = append(sr, ts.SensorAddr)
 	// 指令功能码
 	sr = append(sr, InfoMK["ReadFunc"]...)
 	// 寄存器地址和数量
@@ -79,15 +82,15 @@ func (ts *TaskSensorBody) CreateMeasureRequest() {
  * 当LocalSensorInformation没有设置handler时, 所调用的默认处理过程
  * DefaultHandler中规定了几种默认的处理方式
  */
-func SensorDefaultHandler(body TaskSensorBody, wg *sync.WaitGroup) {
+func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 
 	switch body.Type {
 	case DissolvedOxygenAndTemperature:
 		// 得到透传conn
-		b, _ := GetDeviceSession(body.TaskSensorKey.Attach)
+		b, _ := GetDeviceSession(body.SensorAttachIP)
 		// 合成地址
 		body.CreateMeasureRequest()
-		fmt.Printf("[INFO] 测量请求 -> 传感器设备ID %s | 设备地址 %d | 任务类型 %d | 请求数据 %b |\n", body.SensorID, body.TaskSensorKey.Addr, body.Type, body.RequestData)
+		fmt.Printf("[INFO] 测量请求 -> 传感器设备ID %s | 设备地址 %d | 任务类型 %d | 请求数据 %b |\n", body.SensorID, body.SensorAddr, body.Type, body.RequestData)
 		// 向传感器发送对应测量请求
 		p, err := b.MeasureRequest(body.RequestData, []string{"Oxygen", "Temp"})
 		if err != nil {
@@ -163,17 +166,23 @@ func (ls *LocalSensorInformation) RemoveTaskHandler() bool {
  */
 func (ls *LocalSensorInformation) CreateTask(times int, queueChannel chan TaskSensorBody) error {
 	key := TaskSensorKey{ls.Addr, ls.Attach, ls.Type}
-
+	// key由传感器地址addr + 依附下位机attachIP + 传感器类型type构成
 	body := TaskSensorBody{}
-	body.TaskSensorKey = key
+	body.SensorAddr = ls.Addr
 	body.Type = ls.Type
 	body.RequestData = nil
 	body.SensorID = ls.SensorID
-	if ls.TaskHandler == nil {
-		body.customFunction = nil
-	} else {
-		body.customFunction = ls.TaskHandler
-	}
+	body.SensorAttachIP = ls.Attach
+
+	// 是否存在自定义任务
+	// 这里应该不需要这个自定义任务了, 应该改到pop中
+	//if ls.TaskHandler == nil {
+	//	body.customFunction = nil
+	//} else {
+	//	body.customFunction = ls.TaskHandler
+	//}
+
+	// data由信息体data + 阻塞channel构成
 	data := TaskData{"Data": body, "Channel": queueChannel}
 	return tw.AddTask(time.Duration(ls.Interval*taskSecond), times, key, data, TaskSensorPush)
 }
@@ -190,6 +199,7 @@ func TaskSensorPush(data TaskData) {
 
 /**
  * 单DTU任务调度Routine
+ * 特别说明: 当遇到的任务不是定时执行的时候, 比如是用户修改了传感器的某一项参数时, 需要提前得知queueChannel的地址
  * @param queueChannel 单DTU内任务的阻塞队列
  */
 func TaskSensorPop(queueChannel chan TaskSensorBody) {
@@ -199,8 +209,10 @@ func TaskSensorPop(queueChannel chan TaskSensorBody) {
 		if !ok {
 			break
 		} else {
+			// 确保数据有序进行
 			wg.Add(1)
-			SensorDefaultHandler(v, &wg)
+			DefaultSensorHandler(v, &wg)
+			// 等待上一个任务完成
 			wg.Wait()
 		}
 	}
@@ -224,7 +236,6 @@ func (ls *LocalSensorInformation) RemoveTask() error {
 func (ls *LocalSensorInformation) UpdateTask(interval time.Duration, queueChannel chan TaskSensorBody) error {
 	key := TaskSensorKey{ls.Addr, ls.Attach, ls.Type}
 	body := TaskSensorBody{}
-	body.TaskSensorKey = key
 	body.Type = ls.Type
 	body.RequestData = nil
 	body.SensorID = ls.SensorID
@@ -253,12 +264,14 @@ func GetTimeWheel() *TimeWheel {
 	return tw
 }
 
-func TaskSetup(ip string) {
+func TaskSetup(attachIP string) {
 	ch := make(chan TaskSensorBody, 10)
 	go TaskSensorPop(ch)
 	// 此处得到attach到该dtu的至少0个, 至多3个传感器的参数
 	// TODO: 重构1 初始化传感器状态
-	for _, v := range GetLocalDevices().GetLocalSensorList(ip) {
+
+	// 为attach的每一个传感器设置定时任务
+	for _, v := range GetLocalDevicesInstance().GetLocalSensorList(attachIP) {
 		if err := v.CreateTask(-1, ch); err != nil {
 			continue
 		}
