@@ -1,7 +1,5 @@
 {
-  "name": "r3inb",
-  "id": "1703422",
-  "ip": "192.168.5.55",
+  "name": "示例收集器名",
   "localSensorInformation": [
     {
       "addr": 6,

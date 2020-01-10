@@ -10,7 +10,7 @@ import (
 /**
  * which attached to the device ips
  */
-func (dl *LocalDeviceList) GetLocalSensorList(attachIP string) []LocalSensorInformation {
+func (dl *LocalDeviceDetail) GetLocalSensorList(attachIP string) []LocalSensorInformation {
 	var ret []LocalSensorInformation
 	for _, v := range dl.LocalSensorInformation {
 		if v.Attach == attachIP {
