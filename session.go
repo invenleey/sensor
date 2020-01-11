@@ -91,6 +91,23 @@ type DeviceMeta struct {
 //}
 
 /**
+ * 简单发送
+ * 超时返回
+ *
+ */
+func (ds *DeviceSession) SendToSensor(requestData []byte) ([]byte, error) {
+	ds.writeChan <- requestData
+	for {
+		select {
+		case readData := <- ds.readChan:
+			return readData, nil
+		case <-time.After(10 * time.Second):
+			return nil, errors.New("connected timeout")
+		}
+	}
+}
+
+/**
  * 向ds发送特定的指令(需要包含crc纠错), 等待回应
  * @param data 请求体
  * @callback 自定义的回调处理

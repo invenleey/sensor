@@ -113,7 +113,8 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 			fmt.Println("[FAIL] 请求失败")
 			// TODO 超时处理
 			v, _ := GetLocalSensor(body.SensorID)
-			v.Status = 88
+			// 超时标记
+			v.Status = STATUS_DETACH
 			return
 		}
 		p.SensorID = body.SensorID
@@ -295,18 +296,35 @@ func TaskSetup(attachIP string) {
 		}
 		fmt.Printf("[INFO] ID:%s 进入队列\n", v.SensorID)
 	}
-	// 
+	//
 }
 
-// 扫描attach传感器状态
+// 扫描attach(下位机)内传感器状态
 // 在processor内的for进行首次判断
-func ScannerSensorStatus(attach string) {
-	//attachs := GetLocalDevicesInstance().GetLocalSensorList(attach)
-	//for k, _ := range attachs {
-	//	ds, _ := GetDeviceSession(attach)
-	//	ds.MeasureRequest()
-	//
-	//}
+func ScanSensorStatus(attach string) {
+	// 传感器列表
+	sensors := GetLocalDevicesInstance().GetLocalSensorList(attach)
+	// session
+	ds, _ := GetDeviceSession(attach)
+	for _, v := range sensors {
+		var sr []byte
+		// 设备ADDR
+		sr = append(sr, v.Addr)
+		// 指令功能码
+		sr = append(sr, InfoMK["ReadFunc"]...)
+		// 寄存器地址和数量
+		sr = append(sr, InfoMK["RAddr"]...)
+		// CRC_ModBus
+		sr = append(sr, CreateCRC(sr)...)
+		if _, err := ds.SendToSensor(sr); err != nil {
+			// 超时
+			v.Status = STATUS_DETACH
+		} else {
+			// TODO: 最后记得把fmt换成日志log输出
+			v.Status = STATUS_NORMAL
+			fmt.Println("[INFO] 设备连接成功" + v.SensorID + " FROM " + v.Attach)
+		}
+	}
 }
 
 // 通过sensorID获得LocalSensorInformation

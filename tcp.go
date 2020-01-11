@@ -24,7 +24,7 @@ func testStatus()  {
 
 func RunDeviceTCP() {
 	InitInfoMK()
-	// go testStatus()
+	go testStatus()
 	listener, err := net.Listen(Network, Address)
 	if err != nil {
 		fmt.Println("[错误]", err)
