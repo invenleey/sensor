@@ -2,6 +2,7 @@ package sensor
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -10,8 +11,8 @@ import (
 /**
  * @return 关联至attachIP上的至少0个传感器
  */
-func (dl *LocalDeviceDetail) GetLocalSensorList(attachIP string) []LocalSensorInformation {
-	var ret []LocalSensorInformation
+func (dl *LocalDeviceDetail) GetLocalSensorList(attachIP string) []*LocalSensorInformation {
+	var ret []*LocalSensorInformation
 	for _, v := range dl.LocalSensorInformation {
 		if v.Attach == attachIP {
 			ret = append(ret, v)
@@ -46,15 +47,30 @@ var tw *TimeWheel
 
 const taskSecond int64 = 1000000000
 
-// 指令类型Type
-const DissolvedOxygenAndTemperature byte = 0x01 // 溶氧量和温度
-const D2 byte = 0x02                            // 未定义的类型
-const D3 byte = 0x04                            // ..
-const D4 byte = 0x08                            // ..
-const D5 byte = 0x10                            // ..
-const D6 byte = 0x20                            // ..
-const D7 byte = 0x40                            // ..
-const D8 byte = 0x80                            // 未定义的类型
+const (
+	DissolvedOxygenAndTemperature = iota // 溶氧量
+	D2
+	D3
+	D4
+	D5
+	D6
+	D7
+	D8
+	OnlineScanner // 在线 -> 8
+	// 自定义指令Type 用于一次性的用户设置指令等
+
+)
+
+//// 指令类型Type
+//const DissolvedOxygenAndTemperature byte = 0x01 // 溶氧量和温度
+//const D2 byte = 0x02                            // 未定义的类型
+//const D3 byte = 0x04                            // ..
+//const D4 byte = 0x08                            // ..
+//const D5 byte = 0x10                            // ..
+//const D6 byte = 0x20                            // ..
+//const D7 byte = 0x40                            // ..
+//const D8 byte = 0x80                            // 未定义的类型
+
 // 自定义指令Type 用于一次性的用户设置指令等
 
 // enum
@@ -95,7 +111,9 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 		p, err := b.MeasureRequest(body.RequestData, []string{"Oxygen", "Temp"})
 		if err != nil {
 			fmt.Println("[FAIL] 请求失败")
-			// TODO 当DTU没有接受到传感器响应时, 决定是否要结束
+			// TODO 超时处理
+			v, _ := GetLocalSensor(body.SensorID)
+			v.Status = 88
 			return
 		}
 		p.SensorID = body.SensorID
@@ -277,4 +295,27 @@ func TaskSetup(attachIP string) {
 		}
 		fmt.Printf("[INFO] ID:%s 进入队列\n", v.SensorID)
 	}
+	// 
+}
+
+// 扫描attach传感器状态
+// 在processor内的for进行首次判断
+func ScannerSensorStatus(attach string) {
+	//attachs := GetLocalDevicesInstance().GetLocalSensorList(attach)
+	//for k, _ := range attachs {
+	//	ds, _ := GetDeviceSession(attach)
+	//	ds.MeasureRequest()
+	//
+	//}
+}
+
+// 通过sensorID获得LocalSensorInformation
+func GetLocalSensor(sensorID string) (*LocalSensorInformation, error) {
+	ins := GetLocalDevicesInstance().LocalSensorInformation
+	for _, v := range ins {
+		if v.SensorID == sensorID {
+			return v, nil
+		}
+	}
+	return nil, errors.New("not find sensorID for this device")
 }

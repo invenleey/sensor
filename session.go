@@ -91,27 +91,31 @@ type DeviceMeta struct {
 //}
 
 /**
- * send bytes to device
- * this Device must reg info last send message
- * the callback func will return data when the device send
+ * 向ds发送特定的指令(需要包含crc纠错), 等待回应
+ * @param data 请求体
+ * @callback 自定义的回调处理
+ * @param timeout 超时channel处理
  */
 func (ds *DeviceSession) SendWord(data []byte, callback func(dm DeviceMeta, data []byte) (ReadResult, error)) (ReadResult, error) {
-	ds.Lock()
 	ds.writeChan <- data
-	ds.OpenReadTimeout()
 	for {
 		select {
 		case readData := <-ds.readChan:
-			ds.StopReadTimeout()
-			dm, md, err := SplitMeasure(readData)
+			// 检测数据
+			dm, md, err := SplitAndValidate(readData)
 			var rs ReadResult
 			if err != nil {
 				fmt.Println("error data")
 			} else {
+				// 回调的自定义处理
 				rs, err = callback(dm, md)
 			}
-			ds.Unlock()
 			return rs, err
+		case <-time.After(10 * time.Second):
+			// 超时处理, 识别为不存在的传感器, 即失去物理连接的
+			// 是否考虑多次才出现
+			fmt.Println("[WARN] 传感器连接超时")
+			return ReadResult{}, errors.New("sensor timeout")
 		}
 	}
 }

@@ -72,13 +72,14 @@ func SplitConfig(src []byte) ([]byte, []byte, []byte, error) {
 }
 
 /**
- * separate measure command parameters
- * @params src is a measure respond data
- * @params ByteCount
- * @return DeviceAddr and FuncCode
- * @return MeasureData
+ * CRC验证与拆分过程
+ * 验证respond的类型, crc校验以及是否为可被类型识别的指令返回体
+ * @param src 接收到的数据
+ * @return DeviceMeta 验证过程中拆分到的meta数据
+ * @return []byte 拆分到的数据体
+ * @return CRC验证失败时的错误返回
  */
-func SplitMeasure(src []byte) (DeviceMeta, []byte, error) {
+func SplitAndValidate(src []byte) (DeviceMeta, []byte, error) {
 	base := len(src) - 2
 	if ValidateCRC(src[:base], src[base:]) {
 		var meta DeviceMeta
@@ -164,7 +165,7 @@ type LocalSensorInformation struct {
 // 下位机参数
 type LocalDeviceDetail struct {
 	Name                   string                   `json:"name"`                   // 收集器名称
-	LocalSensorInformation []LocalSensorInformation `json:"localSensorInformation"` // 传感器集合
+	LocalSensorInformation []*LocalSensorInformation `json:"localSensorInformation"` // 传感器集合
 }
 
 // 加载测试
