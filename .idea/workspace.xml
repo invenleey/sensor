@@ -3,8 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="651a59bc-957f-466d-b5b6-7e1bb7cecee5" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/processor.go" beforeDir="false" afterPath="$PROJECT_DIR$/processor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sensor_query.go" beforeDir="false" afterPath="$PROJECT_DIR$/sensor_query.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/count/count_log.go" beforeDir="false" afterPath="$PROJECT_DIR$/count/count_log.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +65,7 @@
       <recent name="D:\sensor\cmd" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build sensor/cmd">
+  <component name="RunManager" selected="Go Test.TestAddErrorLog in sensor/count">
     <configuration name="go build sensor/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="sensor" />
       <working_directory value="$PROJECT_DIR$" />
@@ -74,6 +73,17 @@
       <filePath value="$PROJECT_DIR$/cmd/simple.go" />
       <package value="sensor/cmd" />
       <directory value="$PROJECT_DIR$/" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestAddErrorLog in sensor/count" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="sensor" />
+      <working_directory value="$PROJECT_DIR$/count" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="sensor/count" />
+      <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/" />
+      <pattern value="^TestAddErrorLog$" />
       <method v="2" />
     </configuration>
     <configuration name="TestGetInformation in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -85,17 +95,6 @@
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
       <pattern value="^TestGetInformation$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestGetMQTTInstance in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="sensor" />
-      <working_directory value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="sensor" />
-      <directory value="$PROJECT_DIR$/" />
-      <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestGetMQTTInstance$" />
       <method v="2" />
     </configuration>
     <configuration name="TestOpenKit in sensor (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -122,11 +121,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestAddErrorLog in sensor/count" />
         <item itemvalue="Go Build.go build sensor/cmd" />
         <item itemvalue="Go Test.TestOpenKit in sensor (1)" />
         <item itemvalue="Go Test.TestReadDeviceList in sensor" />
         <item itemvalue="Go Test.TestGetInformation in sensor" />
-        <item itemvalue="Go Test.TestGetMQTTInstance in sensor" />
       </list>
     </recent_temporary>
   </component>
@@ -173,42 +172,46 @@
     <proxy>direct</proxy>
   </component>
   <component name="WindowStateProjectService">
+    <state x="462" y="146" key="#com.intellij.ide.util.MemberChooser" timestamp="1578802847834">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state x="462" y="146" key="#com.intellij.ide.util.MemberChooser/0.0.1368.872@0.0.1368.872" timestamp="1578802847834" />
     <state width="522" height="466" key="DebuggerActiveHint" timestamp="1578703415184">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
     <state width="522" height="466" key="DebuggerActiveHint/0.0.1368.872@0.0.1368.872" timestamp="1578703415184" />
-    <state width="1326" height="227" key="GridCell.Tab.0.bottom" timestamp="1578797896275">
+    <state width="1326" height="268" key="GridCell.Tab.0.bottom" timestamp="1578807986848">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="227" key="GridCell.Tab.0.bottom/0.0.1368.872@0.0.1368.872" timestamp="1578797896275" />
-    <state width="1326" height="227" key="GridCell.Tab.0.center" timestamp="1578797896275">
+    <state width="1326" height="268" key="GridCell.Tab.0.bottom/0.0.1368.872@0.0.1368.872" timestamp="1578807986848" />
+    <state width="1326" height="268" key="GridCell.Tab.0.center" timestamp="1578807986848">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="227" key="GridCell.Tab.0.center/0.0.1368.872@0.0.1368.872" timestamp="1578797896275" />
-    <state width="1326" height="227" key="GridCell.Tab.0.left" timestamp="1578797896272">
+    <state width="1326" height="268" key="GridCell.Tab.0.center/0.0.1368.872@0.0.1368.872" timestamp="1578807986848" />
+    <state width="1326" height="268" key="GridCell.Tab.0.left" timestamp="1578807986847">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="227" key="GridCell.Tab.0.left/0.0.1368.872@0.0.1368.872" timestamp="1578797896272" />
-    <state width="1326" height="227" key="GridCell.Tab.0.right" timestamp="1578797896275">
+    <state width="1326" height="268" key="GridCell.Tab.0.left/0.0.1368.872@0.0.1368.872" timestamp="1578807986847" />
+    <state width="1326" height="268" key="GridCell.Tab.0.right" timestamp="1578807986848">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="227" key="GridCell.Tab.0.right/0.0.1368.872@0.0.1368.872" timestamp="1578797896275" />
-    <state width="1326" height="218" key="GridCell.Tab.1.bottom" timestamp="1578704111910">
+    <state width="1326" height="268" key="GridCell.Tab.0.right/0.0.1368.872@0.0.1368.872" timestamp="1578807986848" />
+    <state width="1326" height="218" key="GridCell.Tab.1.bottom" timestamp="1578807777352">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="218" key="GridCell.Tab.1.bottom/0.0.1368.872@0.0.1368.872" timestamp="1578704111910" />
-    <state width="1326" height="218" key="GridCell.Tab.1.center" timestamp="1578704111909">
+    <state width="1326" height="218" key="GridCell.Tab.1.bottom/0.0.1368.872@0.0.1368.872" timestamp="1578807777352" />
+    <state width="1326" height="218" key="GridCell.Tab.1.center" timestamp="1578807777352">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="218" key="GridCell.Tab.1.center/0.0.1368.872@0.0.1368.872" timestamp="1578704111909" />
-    <state width="1326" height="218" key="GridCell.Tab.1.left" timestamp="1578704111908">
+    <state width="1326" height="218" key="GridCell.Tab.1.center/0.0.1368.872@0.0.1368.872" timestamp="1578807777352" />
+    <state width="1326" height="218" key="GridCell.Tab.1.left" timestamp="1578807777351">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="218" key="GridCell.Tab.1.left/0.0.1368.872@0.0.1368.872" timestamp="1578704111908" />
-    <state width="1326" height="218" key="GridCell.Tab.1.right" timestamp="1578704111909">
+    <state width="1326" height="218" key="GridCell.Tab.1.left/0.0.1368.872@0.0.1368.872" timestamp="1578807777351" />
+    <state width="1326" height="218" key="GridCell.Tab.1.right" timestamp="1578807777352">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="218" key="GridCell.Tab.1.right/0.0.1368.872@0.0.1368.872" timestamp="1578704111909" />
+    <state width="1326" height="218" key="GridCell.Tab.1.right/0.0.1368.872@0.0.1368.872" timestamp="1578807777352" />
     <state x="187" y="79" key="SettingsEditor" timestamp="1578577334210">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
@@ -234,6 +237,16 @@
           <url>file://$PROJECT_DIR$/mqtt_client_test.go</url>
           <line>42</line>
           <option name="timeStamp" value="25" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/count/count_log.go</url>
+          <line>88</line>
+          <option name="timeStamp" value="36" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/count/count_log.go</url>
+          <line>87</line>
+          <option name="timeStamp" value="37" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
