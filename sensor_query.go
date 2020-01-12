@@ -56,7 +56,6 @@ const (
 	D6
 	D7
 	D8
-	OnlineScanner // 在线 -> 8
 	// 自定义指令Type 用于一次性的用户设置指令等
 
 )
@@ -99,6 +98,15 @@ func (ts *TaskSensorBody) CreateMeasureRequest() {
  * DefaultHandler中规定了几种默认的处理方式
  */
 func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
+	// 传感器异常
+	// 最好把任务关掉
+	if value, err := GetLocalSensor(body.SensorID); err != nil {
+		fmt.Println("[FAIL] key not found ", err)
+	} else if value.Status == STATUS_DETACH || value.Status == STATUS_CLOSED {
+		// 不执行操作
+		wg.Done()
+		return
+	}
 
 	switch body.Type {
 	case DissolvedOxygenAndTemperature:
@@ -115,7 +123,9 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 			v, _ := GetLocalSensor(body.SensorID)
 			// 超时标记
 			v.Status = STATUS_DETACH
-			return
+			// waitGroup完成
+
+			break
 		}
 		p.SensorID = body.SensorID
 		send, err := json.Marshal(p)
@@ -207,7 +217,7 @@ func (ls *LocalSensorInformation) CreateTask(times int, queueChannel chan TaskSe
 }
 
 /**
- * 单DTU任务阻塞队列的压入回调
+ * 单DTU任务阻塞队列的压入
  * @param queueChannel 单DTU内任务的阻塞队列
  */
 func TaskSensorPush(data TaskData) {
@@ -226,7 +236,7 @@ func TaskSensorPop(queueChannel chan TaskSensorBody) {
 	for {
 		v, ok := <-queueChannel
 		if !ok {
-			break
+			continue
 		} else {
 			// 确保数据有序进行
 			wg.Add(1)
@@ -235,6 +245,7 @@ func TaskSensorPop(queueChannel chan TaskSensorBody) {
 			wg.Wait()
 		}
 	}
+
 }
 
 /**
@@ -283,6 +294,9 @@ func GetTimeWheel() *TimeWheel {
 	return tw
 }
 
+/*
+ * 定时任务设置
+ */
 func TaskSetup(attachIP string) {
 	ch := make(chan TaskSensorBody, 10)
 	go TaskSensorPop(ch)
@@ -296,11 +310,12 @@ func TaskSetup(attachIP string) {
 		}
 		fmt.Printf("[INFO] ID:%s 进入队列\n", v.SensorID)
 	}
-	//
 }
 
-// 扫描attach(下位机)内传感器状态
-// 在processor内的for进行首次判断
+/*
+ * 扫描attach(下位机)内传感器状态
+ * 在processor内的for进行首次判断
+ */
 func ScanSensorStatus(attach string) {
 	// 传感器列表
 	sensors := GetLocalDevicesInstance().GetLocalSensorList(attach)
@@ -327,7 +342,9 @@ func ScanSensorStatus(attach string) {
 	}
 }
 
-// 通过sensorID获得LocalSensorInformation
+/*
+ * 通过sensorID获得LocalSensorInformation
+ */
 func GetLocalSensor(sensorID string) (*LocalSensorInformation, error) {
 	ins := GetLocalDevicesInstance().LocalSensorInformation
 	for _, v := range ins {
