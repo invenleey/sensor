@@ -19,16 +19,28 @@ type DeviceSession struct {
 }
 
 type interfaceDevice interface {
-	KillDevice()
-	SendWord(data []byte, callback func(dm DeviceMeta, data []byte) (ReadResult, error)) (ReadResult, error)
+	// dtu设备释放
+	ReleaseDevice()
+	// 定时任务释放
+	ReleaseTask()
 
+	// 写1
+	SendWord(data []byte, callback func(dm DeviceMeta, data []byte) (ReadResult, error)) (ReadResult, error)
+	// 写2
+	SendToSensor(requestData []byte) ([]byte, error)
+
+	// TCP超时
 	OpenReadTimeout()
 	StopReadTimeout()
 
+	// 读写
 	ReadConn()
 	WriteConn()
+
+	// 心跳
 	HeartBeating(timeout int)
 
+	// 内容, 不应该在这
 	GetResultInstance(meta DeviceMeta) (ReadResult, error)
 }
 
@@ -50,13 +62,13 @@ func RegDeviceSession(conn net.Conn) DeviceSession {
 
 /**
  * return the device session which search for
- * if a non-existent key, return {} and false
+ * if a non-existent key, return err
  */
-func GetDeviceSession(addr string) (DeviceSession, bool) {
+func GetDeviceSession(addr string) (DeviceSession, error) {
 	if v, ok := SessionsCollection.Load(addr); ok {
-		return v.(DeviceSession), true
+		return v.(DeviceSession), nil
 	} else {
-		return DeviceSession{}, false
+		return DeviceSession{}, errors.New("not found session")
 	}
 }
 
@@ -74,10 +86,24 @@ func ShowNodeIPs() []string {
 }
 
 /**
- * delete key-value on sync hashMap
+ * 释放Map中session
  */
-func (ds *DeviceSession) KillDevice() {
+func (ds *DeviceSession) ReleaseDevice() {
 	SessionsCollection.Delete(strings.Split(ds.conn.RemoteAddr().String(), ":")[0])
+}
+
+/**
+ * 释放Map中task
+ */
+func (ds *DeviceSession) ReleaseTask() {
+	// 移除任务
+	for _, v := range GetLocalDevicesInstance().GetLocalSensorList(strings.Split(ds.conn.RemoteAddr().String(), ":")[0]) {
+		if err := v.RemoveTask(); err != nil {
+			fmt.Println("[WARN] 释放任务过程出现错误 ", err)
+		} else {
+			fmt.Println("[INFO] 释放传感器任务资源 " + v.SensorID)
+		}
+	}
 }
 
 type DeviceMeta struct {
@@ -91,27 +117,48 @@ type DeviceMeta struct {
 //}
 
 /**
- * send bytes to device
- * this Device must reg info last send message
- * the callback func will return data when the device send
+ * 简单发送
+ * 超时返回
+ *
+ */
+func (ds *DeviceSession) SendToSensor(requestData []byte) ([]byte, error) {
+	ds.writeChan <- requestData
+	for {
+		select {
+		case readData := <- ds.readChan:
+			return readData, nil
+		case <-time.After(10 * time.Second):
+			return nil, errors.New("connected timeout")
+		}
+	}
+}
+
+/**
+ * 向ds发送特定的指令(需要包含crc纠错), 等待回应
+ * @param data 请求体
+ * @callback 自定义的回调处理
+ * @param timeout 超时channel处理
  */
 func (ds *DeviceSession) SendWord(data []byte, callback func(dm DeviceMeta, data []byte) (ReadResult, error)) (ReadResult, error) {
-	ds.Lock()
 	ds.writeChan <- data
-	ds.OpenReadTimeout()
 	for {
 		select {
 		case readData := <-ds.readChan:
-			ds.StopReadTimeout()
-			dm, md, err := SplitMeasure(readData)
+			// 检测数据
+			dm, md, err := SplitAndValidate(readData)
 			var rs ReadResult
 			if err != nil {
 				fmt.Println("error data")
 			} else {
+				// 回调的自定义处理
 				rs, err = callback(dm, md)
 			}
-			ds.Unlock()
 			return rs, err
+		case <-time.After(10 * time.Second):
+			// 超时处理, 识别为不存在的传感器, 即失去物理连接的
+			// 是否考虑多次才出现
+			fmt.Println("[WARN] 传感器连接超时")
+			return ReadResult{}, errors.New("sensor timeout")
 		}
 	}
 }

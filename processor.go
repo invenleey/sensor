@@ -7,12 +7,14 @@ import (
 )
 
 func HandleProcessor(conn net.Conn) {
+	dtuIpv4 := strings.Split(conn.RemoteAddr().String(), ":")[0]
+
 	fmt.Println("[连接]", conn.RemoteAddr())
 	defer conn.Close()
 	// session
 	b := RegDeviceSession(conn)
 	// setup time wheel
-	TaskSetup(strings.Split(conn.RemoteAddr().String(), ":")[0])
+	ch := TaskSetup(dtuIpv4)
 
 	go b.ReadConn()
 	go b.WriteConn()
@@ -32,7 +34,16 @@ func HandleProcessor(conn net.Conn) {
 			// pick out
 			if stop {
 				fmt.Println("[断开]", conn.RemoteAddr())
-				b.KillDevice()
+				// 资源释放过程
+
+				// 移除session
+				b.ReleaseDevice()
+
+				// 移除task
+				b.ReleaseTask()
+
+				// 关闭任务通道
+				close(ch)
 				break
 			}
 		}

@@ -1,19 +1,17 @@
 {
-  "name": "r3inb",
-  "id": "1703422",
-  "ip": "192.168.5.55",
+  "name": "示例收集器名",
   "localSensorInformation": [
     {
       "addr": 6,
       "sensorID": "7eb220dd-6127-58c7-8663-bf2f55371b78",
-      "type": 1,
-      "attach": "192.168.50.52",
+      "type": 0,
+      "attach": "172.20.10.4",
       "interval": 10
     },
     {
       "addr": 3,
       "sensorID": "aec66d1a-c39a-5a9d-91bf-ad41154069fc",
-      "type": 1,
+      "type": 0,
       "attach": "192.168.5.58",
       "interval": 5
     }

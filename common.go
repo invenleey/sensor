@@ -72,13 +72,14 @@ func SplitConfig(src []byte) ([]byte, []byte, []byte, error) {
 }
 
 /**
- * separate measure command parameters
- * @params src is a measure respond data
- * @params ByteCount
- * @return DeviceAddr and FuncCode
- * @return MeasureData
+ * CRC验证与拆分过程
+ * 验证respond的类型, crc校验以及是否为可被类型识别的指令返回体
+ * @param src 接收到的数据
+ * @return DeviceMeta 验证过程中拆分到的meta数据
+ * @return []byte 拆分到的数据体
+ * @return CRC验证失败时的错误返回
  */
-func SplitMeasure(src []byte) (DeviceMeta, []byte, error) {
+func SplitAndValidate(src []byte) (DeviceMeta, []byte, error) {
 	base := len(src) - 2
 	if ValidateCRC(src[:base], src[base:]) {
 		var meta DeviceMeta
@@ -141,10 +142,19 @@ func T() {
 
 // ========================json-part-start===========================
 
+// 传感器可能出现的状态
+const (
+	STATUS_NORMAL = iota // 正常运行的
+	STATUS_DETACH        // 异常断开的
+	STATUS_CLOSED        // 人为关闭的 备注: 该状态不写入CONFIG文件中, 因此该状态仅持续到下位机重启时刻
+)
+
+// 传感器参数 包含自定义任务和状态等信息
 type LocalSensorInformation struct {
 	// ==========OPTIONS============
 	TaskHandler func(body TaskSensorBody, wg *sync.WaitGroup) // 自定义传感器任务
-	// ==========文件相关============
+	Status      int                                           // 传感器状态
+	// ==========CONFIGS============
 	Addr     byte   `json:"addr"`     // 传感器设备地址
 	Type     byte   `json:"type"`     // 传感器类型
 	Attach   string `json:"attach"`   // 传感器附着的透传设备
@@ -152,34 +162,36 @@ type LocalSensorInformation struct {
 	SensorID string `json:"sensorID"` // 传感器ID
 }
 
-type LocalDeviceList struct {
-	Name                   string                   `json:"name"`                   // 透传设备名称
-	ID                     string                   `json:"id"`                     // 透传设备地址
-	IP                     string                   `json:"ip"`                     // 透传设备IP
-	LocalSensorInformation []LocalSensorInformation `json:"localSensorInformation"` // 传感器集合
+// 下位机参数
+type LocalDeviceDetail struct {
+	Name                   string                   `json:"name"`                   // 收集器名称
+	LocalSensorInformation []*LocalSensorInformation `json:"localSensorInformation"` // 传感器集合
 }
 
-// default
-func GetConfigTest() *LocalDeviceList {
+// 加载测试
+func GetConfigTest() *LocalDeviceDetail {
 	config := LoadConfig("cnf/conf.json")
 	return config
 }
 
-var localDeviceList *LocalDeviceList = nil
+// 本地传感器信息()
+var localDeviceDetail *LocalDeviceDetail = nil
 
-func GetLocalDevices() *LocalDeviceList {
-	if localDeviceList == nil {
-		localDeviceList = GetConfigTest()
-		return localDeviceList
+// 加载参数
+func GetLocalDevicesInstance() *LocalDeviceDetail {
+	if localDeviceDetail == nil {
+		localDeviceDetail = GetConfigTest()
+		return localDeviceDetail
 	} else {
-		return localDeviceList
+		return localDeviceDetail
 	}
 }
 
 const configFileSizeLimit = 10 << 20
 
-func LoadConfig(path string) *LocalDeviceList {
-	var config LocalDeviceList
+// Config加载
+func LoadConfig(path string) *LocalDeviceDetail {
+	var config LocalDeviceDetail
 	configFile, err := os.Open(path)
 	if err != nil {
 		emit("Failed to open config file '%s': %s\n", path, err)
