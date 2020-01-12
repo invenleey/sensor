@@ -14,7 +14,7 @@ func HandleProcessor(conn net.Conn) {
 	// session
 	b := RegDeviceSession(conn)
 	// setup time wheel
-	TaskSetup(dtuIpv4)
+	ch := TaskSetup(dtuIpv4)
 
 	go b.ReadConn()
 	go b.WriteConn()
@@ -41,6 +41,9 @@ func HandleProcessor(conn net.Conn) {
 
 				// 移除task
 				b.ReleaseTask()
+
+				// 关闭任务通道
+				close(ch)
 				break
 			}
 		}

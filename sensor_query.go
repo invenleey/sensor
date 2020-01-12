@@ -231,21 +231,41 @@ func TaskSensorPush(data TaskData) {
  * 特别说明: 当遇到的任务不是定时执行的时候, 比如是用户修改了传感器的某一项参数时, 需要提前得知queueChannel的地址
  * @param queueChannel 单DTU内任务的阻塞队列
  */
-func TaskSensorPop(queueChannel chan TaskSensorBody) {
+func (ds *DeviceSession) TaskSensorPop(queueChannel chan TaskSensorBody) {
 	var wg sync.WaitGroup
+	//for {
+	//	v, ok := <-queueChannel
+	//	if !ok {
+	//		continue
+	//	} else {
+	//		// 确保数据有序进行
+	//		wg.Add(1)
+	//		DefaultSensorHandler(v, &wg)
+	//		// 等待上一个任务完成
+	//		wg.Wait()
+	//	}
+	//}
 	for {
-		v, ok := <-queueChannel
-		if !ok {
-			continue
-		} else {
-			// 确保数据有序进行
-			wg.Add(1)
-			DefaultSensorHandler(v, &wg)
-			// 等待上一个任务完成
-			wg.Wait()
+		select {
+		case v, ok := <-queueChannel:
+			if !ok {
+				fmt.Println("[INFO] POP已更新")
+				return
+			} else {
+				wg.Add(1)
+				DefaultSensorHandler(v, &wg)
+				wg.Wait()
+				break
+			}
 		}
+		//case stop := <-ds.stopChan:
+		//	if stop {
+		//		fmt.Println("[INFO] POP已更新")
+		//		return
+		//		clos
+		//	}
+		//}
 	}
-
 }
 
 /**
@@ -297,11 +317,12 @@ func GetTimeWheel() *TimeWheel {
 /*
  * 定时任务设置
  */
-func TaskSetup(attachIP string) {
+func TaskSetup(attachIP string) chan TaskSensorBody{
 	ch := make(chan TaskSensorBody, 10)
-	go TaskSensorPop(ch)
+	// 这个pop每个dtu有且只有一个, 生命周期应与tcp挂钩
+	ds, _ := GetDeviceSession(attachIP)
+	go ds.TaskSensorPop(ch)
 	// 此处得到attach到该dtu的至少0个, 至多3个传感器的参数
-	// TODO: 重构1 初始化传感器状态
 
 	// 为attach的每一个传感器设置定时任务
 	for _, v := range GetLocalDevicesInstance().GetLocalSensorList(attachIP) {
@@ -310,6 +331,7 @@ func TaskSetup(attachIP string) {
 		}
 		fmt.Printf("[INFO] ID:%s 进入队列\n", v.SensorID)
 	}
+	return ch
 }
 
 /*
