@@ -24,7 +24,7 @@ var sensorLog = make(map[string]*SensorLog)
 const (
 	ERROR_DELAY_LEVEL1 = time.Minute
 	ERROR_DELAY_LEVEL2 = time.Minute * 2
-	ERROR_DELAY_LEVEL3 = time.Minute * 3
+	ERROR_DELAY_LEVEL3 = time.Minute * 5
 )
 
 /*
@@ -43,6 +43,34 @@ func AddErrorOperation(sensorID string) {
 		// 延迟
 		s.ForbidRequest()
 	}
+}
+
+/**
+ * 统计传感器错误次数
+ * @param 传感器ID
+ * @return 返回错误次数
+ */
+func GetErrorCount(sensorID string) int {
+	if v, ok := sensorLog[sensorID]; ok {
+		return v.errorCount
+	}
+	return 0
+}
+
+/**
+ * 清除单个传感器错误信息
+ * @param 传感器ID
+ *
+ */
+func ClsErrorCount(sensorID string) {
+	delete(sensorLog, sensorID)
+}
+
+/**
+ * GC回收吧
+ */
+func ClsAll() {
+	sensorLog = make(map[string]*SensorLog)
 }
 
 /**
