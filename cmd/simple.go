@@ -9,12 +9,13 @@ import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"sensor"
+	mqtt2 "sensor/mqtt"
 )
 
 func main() {
 	// 订阅示例
 	// 上级: GO -> MQTT -> GO
-	sensor.MQTTMapping("sensor/oxygen/measure", 1,
+	mqtt2.MQTTMapping("sensor/oxygen/measure", 1,
 		func(client mqtt.Client, msg mqtt.Message) {
 			fmt.Printf("主题: %s\n", msg.Topic())
 			fmt.Printf("信息: %s\n", msg.Payload())

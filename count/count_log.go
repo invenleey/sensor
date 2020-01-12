@@ -13,10 +13,35 @@ import (
  */
 
 type SensorLog struct {
-	sensorID   string //传感器ID
-	errorCount int    // 连续错误次数三次后 errorTag -> true
-	errorTag   bool   // 错误标识符(禁止重试)
+	sensorID   string    //传感器ID
+	errorCount int       // 连续错误次数三次后 errorTag -> true
+	errorTag   bool      // 错误标识符(禁止重试)
+	retryTime  time.Time // 重试时间
 	sync.Mutex
+}
+
+/**
+ * 返回重试时间
+ */
+func GetRetryTime(sensorID string) time.Time {
+	if v, ok := sensorLog[sensorID]; ok {
+		return v.retryTime
+	}
+	return time.Now()
+}
+
+/**
+ * 重试时间
+ */
+func (sl *SensorLog) getRetryTime() {
+	switch sl.errorCount {
+	case 1:
+		sl.retryTime = time.Now().Add(ERROR_DELAY_LEVEL1)
+	case 2:
+		sl.retryTime = time.Now().Add(ERROR_DELAY_LEVEL2)
+	case 3:
+		sl.retryTime = time.Now().Add(ERROR_DELAY_LEVEL3)
+	}
 }
 
 var sensorLog = make(map[string]*SensorLog)
@@ -30,18 +55,20 @@ const (
 /*
  * 添加错误日志, 一旦通过了三次错误则不再允许出现第四次错误, 直到错误被用户处理
  * @param sensorID 传感器ID
- *
+ * @param int 错误次数
  */
-func AddErrorOperation(sensorID string) {
+func AddErrorOperation(sensorID string) int {
 	// 判断某个Key是否存在
 	if v, ok := sensorLog[sensorID]; ok {
 		v.ForbidRequest()
+		return v.errorCount
 	} else {
 		s := SensorLog{}
 		s.sensorID = sensorID
 		sensorLog[sensorID] = &s
 		// 延迟
 		s.ForbidRequest()
+		return s.errorCount
 	}
 }
 
@@ -94,6 +121,7 @@ func (sl *SensorLog) ForbidRequest() {
 		delayLevel = ERROR_DELAY_LEVEL3
 	}
 	if delayLevel != 0 {
+		sl.getRetryTime()
 		time.AfterFunc(delayLevel, func() {
 			sensorLog[sl.sensorID].errorTag = false
 		})
@@ -103,13 +131,13 @@ func (sl *SensorLog) ForbidRequest() {
 /**
  * 通过判断errorTag, 是否允许传感器进行通信
  * @param sensorID 传感器ID
- * @return true 允许进行/false 禁止进行查询
+ * @return false 允许进行/true 禁止进行查询
  */
 func IsForbidden(sensorID string) bool {
 	if v, ok := sensorLog[sensorID]; ok {
 		if v.errorTag {
-			return false
+			return true
 		}
 	}
-	return true
+	return false
 }
