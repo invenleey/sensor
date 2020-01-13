@@ -22,19 +22,23 @@ func testStatus()  {
 	}
 }
 
+func RestartDevice() {
+
+}
+
 func RunDeviceTCP() {
 	InitInfoMK()
 	go testStatus()
 	listener, err := net.Listen(Network, Address)
 	if err != nil {
-		fmt.Println("[错误]", err)
+		fmt.Println("[FAIL]", err)
 		return
 	}
 	defer listener.Close()
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			fmt.Println("[错误]", err)
+			fmt.Println("[FAIL]", err)
 			return
 		}
 		go HandleProcessor(conn)

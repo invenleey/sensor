@@ -6,22 +6,24 @@
 package main
 
 import (
-	"fmt"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"sensor"
 )
+
 
 func main() {
 	// 订阅示例
 	// 上级: GO -> MQTT -> GO
-	sensor.MQTTMapping("sensor/oxygen/measure", 1,
-		func(client mqtt.Client, msg mqtt.Message) {
-			fmt.Printf("主题: %s\n", msg.Topic())
-			fmt.Printf("信息: %s\n", msg.Payload())
-		})
 
-	// 初始化任务轮盘
-	sensor.TimeWheelInit()
+	// 测量
+	sensor.MQTTMapping("sensor/oxygen/measure", sensor.FncTest)
+
+	// CONFIG更新(重启生效)
+	sensor.MQTTMapping("sensor/setting/all", sensor.SettingConfigHandler)
+
+	// Status&&Exception动态更新
+	sensor.MQTTMapping("sensor/action/clear", sensor.ClearExceptionHandler)
+
+
 
 	// 服务开启示例
 	// 下级: GO -> DTU -> Sensor

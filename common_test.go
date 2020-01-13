@@ -81,3 +81,7 @@ func TestByteToFloat(t *testing.T) {
 //	entity := LoadConfig("conf.json")
 //	fmt.Println(entity)
 //}
+
+func TestDumpConfig(t *testing.T) {
+	_ = GetLocalDevicesInstance().DumpConfig()
+}

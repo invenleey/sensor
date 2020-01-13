@@ -51,11 +51,11 @@ func pMQTTClient() (mqtt.Client, error) {
 	return c, nil
 }
 
-func MQTTMapping(topic string, qos byte, callback mqtt.MessageHandler) bool {
+func MQTTMapping(topic string, callback mqtt.MessageHandler) bool {
 	if mq, err := GetMQTTInstance(); err != nil {
 		fmt.Println("[FAIL] MQTT代理连接失败")
 	} else {
-		if token := mq.Subscribe(topic, qos, callback); token.Wait() && token.Error() != nil {
+		if token := mq.Subscribe(topic, 1, callback); token.Wait() && token.Error() != nil {
 			fmt.Printf("subscribe failed by %s\n", topic)
 			return false
 		}

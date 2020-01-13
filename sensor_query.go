@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sensor/count"
 	"sync"
 	"time"
 )
@@ -99,14 +100,18 @@ func (ts *TaskSensorBody) CreateMeasureRequest() {
  */
 func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 	// 传感器异常
-	// 最好把任务关掉
-	if value, err := GetLocalSensor(body.SensorID); err != nil {
-		fmt.Println("[FAIL] key not found ", err)
-	} else if value.Status == STATUS_DETACH || value.Status == STATUS_CLOSED {
-		// 不执行操作
+	if count.IsForbidden(body.SensorID) {
 		wg.Done()
 		return
 	}
+
+	//if value, err := GetLocalSensor(body.SensorID); err != nil {
+	//	fmt.Println("[FAIL] key not found ", err)
+	//} else if value.Status == STATUS_DETACH || value.Status == STATUS_CLOSED {
+	//	// 不执行操作
+	//	wg.Done()
+	//	return
+	//}
 
 	switch body.Type {
 	case DissolvedOxygenAndTemperature:
@@ -122,7 +127,11 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 			// TODO 超时处理
 			v, _ := GetLocalSensor(body.SensorID)
 			// 超时标记
-			v.Status = STATUS_DETACH
+			if count.AddErrorOperation(body.SensorID) > 3 {
+				v.Status = STATUS_DETACH
+			}
+			fmt.Printf("[WARN] %s发生第%d次错误, 等待%s后重试\n", body.SensorID, count.GetErrorCount(body.SensorID), count.GetRetryTime(body.SensorID))
+			// v.Status = STATUS_DETACH
 			// waitGroup完成
 
 			break
@@ -213,7 +222,7 @@ func (ls *LocalSensorInformation) CreateTask(times int, queueChannel chan TaskSe
 
 	// data由信息体data + 阻塞channel构成
 	data := TaskData{"Data": body, "Channel": queueChannel}
-	return tw.AddTask(time.Duration(ls.Interval*taskSecond), times, key, data, TaskSensorPush)
+	return GetTimeWheel().AddTask(time.Duration(ls.Interval*taskSecond), times, key, data, TaskSensorPush)
 }
 
 /**
@@ -274,7 +283,7 @@ func (ds *DeviceSession) TaskSensorPop(queueChannel chan TaskSensorBody) {
  */
 func (ls *LocalSensorInformation) RemoveTask() error {
 	key := TaskSensorKey{ls.Addr, ls.Attach, ls.Type}
-	return tw.RemoveTask(key)
+	return GetTimeWheel().RemoveTask(key)
 }
 
 /**
@@ -295,7 +304,7 @@ func (ls *LocalSensorInformation) UpdateTask(interval time.Duration, queueChanne
 		body.customFunction = ls.TaskHandler
 	}
 	data := TaskData{"Data": body, "Channel": queueChannel}
-	return tw.UpdateTask(key, interval, data)
+	return GetTimeWheel().UpdateTask(key, interval, data)
 }
 
 /**
@@ -308,9 +317,13 @@ func TimeWheelInit() *TimeWheel {
 }
 
 /*
- * 获得TimeWheel指针
+ * 获得TimeWheel单例
  */
 func GetTimeWheel() *TimeWheel {
+	if tw == nil {
+		tw = New(time.Second, 180)
+		tw.Start()
+	}
 	return tw
 }
 

@@ -14,7 +14,7 @@ func TestGetMQTTInstance(t *testing.T) {
 	// drop
 	for i := 0; i < 100; i++ {
 		text := fmt.Sprintf("this is msg #%d!", i)
-		token := ins.Publish("go-mqtt/sample", 2, true, text)
+		token := ins.Publish("go-mq/sample", 2, true, text)
 		token.Wait()
 	}
 	ins.Disconnect(1000)

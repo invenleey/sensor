@@ -9,7 +9,7 @@ import (
 func HandleProcessor(conn net.Conn) {
 	dtuIpv4 := strings.Split(conn.RemoteAddr().String(), ":")[0]
 
-	fmt.Println("[连接]", conn.RemoteAddr())
+	fmt.Println("[CONN]", conn.RemoteAddr())
 	defer conn.Close()
 	// session
 	b := RegDeviceSession(conn)
@@ -33,7 +33,7 @@ func HandleProcessor(conn net.Conn) {
 		case stop := <-b.stopChan:
 			// pick out
 			if stop {
-				fmt.Println("[断开]", conn.RemoteAddr())
+				fmt.Println("[DISC]", conn.RemoteAddr())
 				// 资源释放过程
 
 				// 移除session
