@@ -1,6 +1,7 @@
 package sensor
 
 import (
+	"fmt"
 	"github.com/eclipse/paho.mqtt.golang"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -48,4 +49,17 @@ func pMQTTClient() (mqtt.Client, error) {
 		return nil, token.Error()
 	}
 	return c, nil
+}
+
+func MQTTMapping(topic string, callback mqtt.MessageHandler) bool {
+	if mq, err := GetMQTTInstance(); err != nil {
+		fmt.Println("[FAIL] MQTT代理连接失败")
+	} else {
+		if token := mq.Subscribe(topic, 1, callback); token.Wait() && token.Error() != nil {
+			fmt.Printf("subscribe failed by %s\n", topic)
+			return false
+		}
+	}
+	fmt.Printf("subscribed %s successfully\n", topic)
+	return true
 }
