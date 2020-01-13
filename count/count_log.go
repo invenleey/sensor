@@ -141,3 +141,7 @@ func IsForbidden(sensorID string) bool {
 	}
 	return false
 }
+
+/**
+ *
+ */

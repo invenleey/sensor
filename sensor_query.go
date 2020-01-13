@@ -223,7 +223,7 @@ func (ls *LocalSensorInformation) CreateTask(times int, queueChannel chan TaskSe
 
 	// data由信息体data + 阻塞channel构成
 	data := TaskData{"Data": body, "Channel": queueChannel}
-	return tw.AddTask(time.Duration(ls.Interval*taskSecond), times, key, data, TaskSensorPush)
+	return GetTimeWheel().AddTask(time.Duration(ls.Interval*taskSecond), times, key, data, TaskSensorPush)
 }
 
 /**
@@ -284,7 +284,7 @@ func (ds *DeviceSession) TaskSensorPop(queueChannel chan TaskSensorBody) {
  */
 func (ls *LocalSensorInformation) RemoveTask() error {
 	key := TaskSensorKey{ls.Addr, ls.Attach, ls.Type}
-	return tw.RemoveTask(key)
+	return GetTimeWheel().RemoveTask(key)
 }
 
 /**
@@ -305,7 +305,7 @@ func (ls *LocalSensorInformation) UpdateTask(interval time.Duration, queueChanne
 		body.customFunction = ls.TaskHandler
 	}
 	data := TaskData{"Data": body, "Channel": queueChannel}
-	return tw.UpdateTask(key, interval, data)
+	return GetTimeWheel().UpdateTask(key, interval, data)
 }
 
 /**
@@ -318,9 +318,13 @@ func TimeWheelInit() *TimeWheel {
 }
 
 /*
- * 获得TimeWheel指针
+ * 获得TimeWheel单例
  */
 func GetTimeWheel() *TimeWheel {
+	if tw == nil {
+		tw = New(time.Second, 180)
+		tw.Start()
+	}
 	return tw
 }
 

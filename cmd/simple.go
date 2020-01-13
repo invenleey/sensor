@@ -22,7 +22,7 @@ func main() {
 		})
 
 	// 初始化任务轮盘
-	sensor.TimeWheelInit()
+	// sensor.TimeWheelInit()
 
 	// 服务开启示例
 	// 下级: GO -> DTU -> Sensor
