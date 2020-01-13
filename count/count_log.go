@@ -93,6 +93,8 @@ func ClsErrorCount(sensorID string) {
 	delete(sensorLog, sensorID)
 }
 
+const CLEAR_ALL_EXCEPTION = "all"
+const CLEAR_ONE_EXCEPTION = "one"
 /**
  * GC回收吧
  */
@@ -143,5 +145,8 @@ func IsForbidden(sensorID string) bool {
 }
 
 /**
- *
+ * 间隔时间处理
  */
+func HandleSlot() {
+
+}

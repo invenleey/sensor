@@ -152,8 +152,8 @@ const (
 // 传感器参数 包含自定义任务和状态等信息
 type LocalSensorInformation struct {
 	// ==========OPTIONS============
-	TaskHandler func(body TaskSensorBody, wg *sync.WaitGroup) // 自定义传感器任务
-	Status      int                                           // 传感器状态
+	TaskHandler func(body TaskSensorBody, wg *sync.WaitGroup) `json:"-"` // 自定义传感器任务
+	Status      int                                           `json:"-"` // 传感器状态
 	// ==========CONFIGS============
 	Addr     byte   `json:"addr"`     // 传感器设备地址
 	Type     byte   `json:"type"`     // 传感器类型
@@ -164,7 +164,7 @@ type LocalSensorInformation struct {
 
 // 下位机参数
 type LocalDeviceDetail struct {
-	Name                   string                   `json:"name"`                   // 收集器名称
+	Name                   string                    `json:"name"`                   // 收集器名称
 	LocalSensorInformation []*LocalSensorInformation `json:"localSensorInformation"` // 传感器集合
 }
 
@@ -227,6 +227,30 @@ func LoadConfig(path string) *LocalDeviceDetail {
 	return &config
 }
 
+/*
+ * 保存CONFIG
+ */
+func (dl *LocalDeviceDetail) DumpConfig() error {
+	// cs := GetLocalDevicesInstance()
+	fp, err := os.Create("cnf/conf.json")
+	if err != nil {
+		panic(err)
+	}
+	defer fp.Close()
+
+	data, err := json.Marshal(dl)
+	if err != nil {
+		panic(err)
+	}
+
+	n, err := fp.Write(data)
+	if err != nil {
+		return err
+	}
+	fmt.Println("[INFO] 已更新CONFIG文件 | 长度:", n)
+	return nil
+}
+
 // 注释清除
 func StripComments(data []byte) ([]byte, error) {
 	data = bytes.Replace(data, []byte("\r"), []byte(""), 0)
@@ -255,3 +279,10 @@ func ResultConfig(test []map[string]interface{}) (port_password []map[string]int
 }
 
 // ========================json-part-end===========================
+
+func IsIp(ip string) (b bool) {
+	if m, _ := regexp.MatchString("^(25[0-5]|2[0-4]\\d|[0-1]\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]\\d{2}|[1-9]?\\d)$", ip); !m {
+		return false
+	}
+	return true
+}

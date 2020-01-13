@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"sensor/count"
-	"sensor/mqtt"
 	"sync"
 	"time"
 )
@@ -139,7 +138,7 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 		}
 		p.SensorID = body.SensorID
 		send, err := json.Marshal(p)
-		client, _ := mqtt.GetMQTTInstance()
+		client, _ := GetMQTTInstance()
 		client.Publish("sensor/oxygen/measure", 1, false, send)
 		break
 	case D2:
