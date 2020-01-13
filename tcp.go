@@ -22,6 +22,10 @@ func testStatus()  {
 	}
 }
 
+func RestartDevice() {
+
+}
+
 func RunDeviceTCP() {
 	InitInfoMK()
 	go testStatus()

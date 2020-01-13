@@ -231,7 +231,6 @@ func LoadConfig(path string) *LocalDeviceDetail {
  * 保存CONFIG
  */
 func (dl *LocalDeviceDetail) DumpConfig() error {
-	// cs := GetLocalDevicesInstance()
 	fp, err := os.Create("cnf/conf.json")
 	if err != nil {
 		panic(err)

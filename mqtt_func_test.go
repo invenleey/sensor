@@ -1,24 +1,27 @@
 package sensor
 
 import (
+	"encoding/json"
 	"testing"
+	"time"
 )
 
-func TestClearExceptionHandler(t *testing.T) {
-	//MQTTMapping("sensor/action/clear", ClearExceptionHandler)
-	//
-	//i := SensorAction{
-	//	SensorID:  "abcdefg",
-	//	Operation: "del",
-	//	Data:      4,
-	//}
-	//
-	//v, _ := json.Marshal(i)
-	//client, _ := GetMQTTInstance()
-	//token := client.Publish("sensor/action/clear", 1, false, v)
-	//token.Wait()
-	//
-	//time.Sleep(time.Minute)
+func TestSettingConfigHandler(t *testing.T) {
+	MQTTMapping("sensor/setting/all", SettingConfigHandler)
+
+	i := SensorAction{
+		SensorID:  "abcdefg",
+		Operation: "del",
+	}
+
+	v := GetLocalDevicesInstance()
+	i.Data, _ = json.Marshal(v)
+
+	j, _ := json.Marshal(i)
+	client, _ := GetMQTTInstance()
+	token := client.Publish("sensor/setting/all", 1, false, j)
+	token.Wait()
+
+	time.Sleep(time.Minute)
 
 }
-
