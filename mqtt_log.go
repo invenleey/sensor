@@ -15,9 +15,9 @@ const (
 	LOG_INFO    = "[INFO] "
 	LOG_WARN    = "[WARN] "
 	LOG_FAIL    = "[FAIL] "
-	MQ_LOG_INFO = iota
-	MQ_LOG_WARN
-	MQ_LOG_FAIL
+	MQ_LOG_INFO = 0
+	MQ_LOG_WARN = 1
+	MQ_LOG_FAIL = 2
 )
 
 type MQLog struct {

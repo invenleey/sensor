@@ -2,13 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="651a59bc-957f-466d-b5b6-7e1bb7cecee5" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/simple.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/simple.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/common.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mqtt_func.go" beforeDir="false" afterPath="$PROJECT_DIR$/mqtt_func.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mqtt_func_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/mqtt_func_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tcp.go" beforeDir="false" afterPath="$PROJECT_DIR$/tcp.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mqtt_log.go" beforeDir="false" afterPath="$PROJECT_DIR$/mqtt_log.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,7 +67,7 @@
       <recent name="D:\sensor\cmd" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestSettingConfigHandler in sensor">
+  <component name="RunManager" selected="Go Test.TestPushMQLog in sensor">
     <configuration name="TestClearExceptionHandler in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="sensor" />
       <working_directory value="$PROJECT_DIR$" />
@@ -106,15 +101,15 @@
       <pattern value="^TestGetMQTTInstance$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestGetMQTTInstance in sensor/mq" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestPushMQLog in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="sensor" />
-      <working_directory value="$PROJECT_DIR$/mq" />
+      <working_directory value="$PROJECT_DIR$" />
       <framework value="gotest" />
       <kind value="PACKAGE" />
-      <package value="sensor/mq" />
+      <package value="sensor" />
       <directory value="$PROJECT_DIR$/" />
       <filePath value="$PROJECT_DIR$/" />
-      <pattern value="^TestGetMQTTInstance$" />
+      <pattern value="^TestPushMQLog$" />
       <method v="2" />
     </configuration>
     <configuration name="TestSettingConfigHandler in sensor" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -130,11 +125,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestPushMQLog in sensor" />
         <item itemvalue="Go Test.TestSettingConfigHandler in sensor" />
         <item itemvalue="Go Test.TestClearExceptionHandler in sensor" />
         <item itemvalue="Go Test.TestDumpConfig in sensor" />
         <item itemvalue="Go Test.TestGetMQTTInstance in sensor" />
-        <item itemvalue="Go Test.TestGetMQTTInstance in sensor/mq" />
       </list>
     </recent_temporary>
   </component>
@@ -189,38 +184,38 @@
       <screen x="0" y="0" width="1368" height="872" />
     </state>
     <state width="832" height="466" key="DebuggerActiveHint/0.0.1368.872@0.0.1368.872" timestamp="1578908204469" />
-    <state width="1326" height="267" key="GridCell.Tab.0.bottom" timestamp="1578908319401">
+    <state width="1326" height="267" key="GridCell.Tab.0.bottom" timestamp="1578914203587">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="267" key="GridCell.Tab.0.bottom/0.0.1368.872@0.0.1368.872" timestamp="1578908319401" />
-    <state width="1326" height="267" key="GridCell.Tab.0.center" timestamp="1578908319401">
+    <state width="1326" height="267" key="GridCell.Tab.0.bottom/0.0.1368.872@0.0.1368.872" timestamp="1578914203587" />
+    <state width="1326" height="267" key="GridCell.Tab.0.center" timestamp="1578914203587">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="267" key="GridCell.Tab.0.center/0.0.1368.872@0.0.1368.872" timestamp="1578908319401" />
-    <state width="1326" height="267" key="GridCell.Tab.0.left" timestamp="1578908319401">
+    <state width="1326" height="267" key="GridCell.Tab.0.center/0.0.1368.872@0.0.1368.872" timestamp="1578914203587" />
+    <state width="1326" height="267" key="GridCell.Tab.0.left" timestamp="1578914203587">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="267" key="GridCell.Tab.0.left/0.0.1368.872@0.0.1368.872" timestamp="1578908319401" />
-    <state width="1326" height="267" key="GridCell.Tab.0.right" timestamp="1578908319401">
+    <state width="1326" height="267" key="GridCell.Tab.0.left/0.0.1368.872@0.0.1368.872" timestamp="1578914203587" />
+    <state width="1326" height="267" key="GridCell.Tab.0.right" timestamp="1578914203587">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="267" key="GridCell.Tab.0.right/0.0.1368.872@0.0.1368.872" timestamp="1578908319401" />
-    <state width="1326" height="218" key="GridCell.Tab.1.bottom" timestamp="1578908250825">
+    <state width="1326" height="267" key="GridCell.Tab.0.right/0.0.1368.872@0.0.1368.872" timestamp="1578914203587" />
+    <state width="1326" height="218" key="GridCell.Tab.1.bottom" timestamp="1578914131186">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="218" key="GridCell.Tab.1.bottom/0.0.1368.872@0.0.1368.872" timestamp="1578908250825" />
-    <state width="1326" height="218" key="GridCell.Tab.1.center" timestamp="1578908250825">
+    <state width="1326" height="218" key="GridCell.Tab.1.bottom/0.0.1368.872@0.0.1368.872" timestamp="1578914131186" />
+    <state width="1326" height="218" key="GridCell.Tab.1.center" timestamp="1578914131186">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="218" key="GridCell.Tab.1.center/0.0.1368.872@0.0.1368.872" timestamp="1578908250825" />
-    <state width="1326" height="218" key="GridCell.Tab.1.left" timestamp="1578908250825">
+    <state width="1326" height="218" key="GridCell.Tab.1.center/0.0.1368.872@0.0.1368.872" timestamp="1578914131186" />
+    <state width="1326" height="218" key="GridCell.Tab.1.left" timestamp="1578914131186">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="218" key="GridCell.Tab.1.left/0.0.1368.872@0.0.1368.872" timestamp="1578908250825" />
-    <state width="1326" height="218" key="GridCell.Tab.1.right" timestamp="1578908250825">
+    <state width="1326" height="218" key="GridCell.Tab.1.left/0.0.1368.872@0.0.1368.872" timestamp="1578914131186" />
+    <state width="1326" height="218" key="GridCell.Tab.1.right" timestamp="1578914131186">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
-    <state width="1326" height="218" key="GridCell.Tab.1.right/0.0.1368.872@0.0.1368.872" timestamp="1578908250825" />
+    <state width="1326" height="218" key="GridCell.Tab.1.right/0.0.1368.872@0.0.1368.872" timestamp="1578914131186" />
     <state x="187" y="79" key="SettingsEditor" timestamp="1578577334210">
       <screen x="0" y="0" width="1368" height="872" />
     </state>
