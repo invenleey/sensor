@@ -6,13 +6,13 @@
 - [x] 通过conf.json文件, 管理传感器设备，绑定设备的IP地址
 - [x] 分配传感器设备ID
 - [x] 支持日志上报
-- [ ] 下位机重启 -> coming soon
+- [x] 下位机重启
 - [x] 传感器状态上报
 - [x] 远程设置传感器
-- [ ] 提供Web界面管理传感器设备
-- [ ] 提供Web界面配置下位机
-- [x] MQTT
-- [ ] 与上位机通讯(暂时以http协议通讯)，把传感器数据推送给上位机服务器，接收上位机指令
+- [ ] 提供Web界面管理传感器设备（使用远程设置代替）
+- [ ] 提供Web界面配置下位机（同上）
+- [x] MQTT通信
+- [ ] 与上位机通讯(暂时以http协议通讯)，把传感器数据推送给上位机服务器，接收上位机指令（使用MQTT代替）
 - [x] 具有缓存功能，在与上位机通讯失败时，缓存未推送成功的数据。与传感器通讯失败时，缓存失败的指令
 
 ##### 使用支持MQTT协议的消息中间件, 这里以RabbitMQ为例的部署方式
@@ -29,6 +29,7 @@ rabbitmq-plugins enable rabbitmq_mqtt
 ```
 
 #####mqtt_client
+
 | 函数名 | 描述                    |  返回值 |
 | ------------- | ------------------------------ |----------------------|
 | `GetMQTTInstance()`| 获得一个MQTT的连接 | mqtt.Client, error |
@@ -56,6 +57,7 @@ rabbitmq-plugins enable rabbitmq_mqtt
 
 
 #####LocalDeviceList
+
 | 成员变量      | 描述 |
 | --------- | -----:|
 | Name     |   透传设备名称 |
@@ -69,6 +71,7 @@ rabbitmq-plugins enable rabbitmq_mqtt
 
 
 #####TaskSensorKey
+
 | 成员变量      | 描述 |
 | --------- | -----:|
 | Addr     |   设备地址 |
@@ -77,6 +80,7 @@ rabbitmq-plugins enable rabbitmq_mqtt
 
 
 #####TaskSensorBody
+
 | 成员变量      | 描述 |
 | --------- | -----:|
 | TaskSensorKey     |   任务唯一id |
