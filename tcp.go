@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	Network = "tcp"
-	Address = ":6564"
+	NETWORK = "tcp"
+	ADDRESS = ":6564"
 )
 
 // sensor status code testing
@@ -22,14 +22,15 @@ func testStatus()  {
 	}
 }
 
-func RestartDevice() {
-
-}
+/**
+ * 对传感器的服务重启
+ * 尽量避免重启解决问题, 需要重启说明程序不够完美
+ */
 
 func RunDeviceTCP() {
 	InitInfoMK()
 	go testStatus()
-	listener, err := net.Listen(Network, Address)
+	listener, err := net.Listen(NETWORK, ADDRESS)
 	if err != nil {
 		fmt.Println("[FAIL]", err)
 		return

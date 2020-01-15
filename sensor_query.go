@@ -232,6 +232,16 @@ func (ls *LocalSensorInformation) CreateTask(times int, queueChannel chan TaskSe
 func TaskSensorPush(data TaskData) {
 	body := data["Data"].(TaskSensorBody)
 	queueChannel := data["Channel"].(chan TaskSensorBody)
+	defer func() {
+		if recover() != nil {
+			fmt.Println("[INFO] 通道已关闭, 发送失败")
+			key := TaskSensorKey{body.SensorAddr, body.SensorAttachIP, body.Type}
+			if err := GetTimeWheel().RemoveTask(key); err != nil {
+				fmt.Println("[WARN] X + X + X")
+			}
+
+		}
+	}()
 	queueChannel <- body
 }
 
