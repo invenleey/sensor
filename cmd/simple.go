@@ -7,6 +7,7 @@ package main
 
 import (
 	"sensor"
+	"time"
 )
 
 func main() {
@@ -23,13 +24,19 @@ func main() {
 	sensor.MQTTMapping("sensor/action/clear", sensor.ClearExceptionHandler)
 
 	// 重启
-	sensor.MQTTMapping("sensor/action/bbbb", sensor.FncTest)
+	sensor.MQTTMapping("sensor/action/restart", sensor.RestartHandler)
 
-	client, _ := sensor.GetMQTTInstance()
-	client.Publish("sensor/action/bbbb", 1, false, 1)
-	// token.Wait()
+	time.AfterFunc(time.Second*20, func() {
+		client, _ := sensor.GetMQTTInstance()
+		client.Publish("sensor/action/restart", 1, false, "1111")
+	})
 
 	// 服务开启示例
 	// 下级: GO -> DTU -> Sensor
-	sensor.RunDeviceTCP()
+	go sensor.RunDeviceTCP()
+
+	// token.Wait()
+
+	time.Sleep(time.Hour)
+
 }

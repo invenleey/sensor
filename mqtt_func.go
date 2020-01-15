@@ -96,8 +96,9 @@ func SettingConfigHandler(client mqtt.Client, message mqtt.Message) {
  * 重启服务 + 重新加载数据
  */
 func RestartHandler(client mqtt.Client, message mqtt.Message) {
+	fmt.Println("[INFO] 正在重启TCP")
 	ReloadDeviceInstance()
-	RestartDeviceTCP()
+	RestartTCPSystem()
 }
 
 /**

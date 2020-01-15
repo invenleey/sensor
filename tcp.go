@@ -49,19 +49,18 @@ func RestartTCPSystem() {
 	s.Range(func(key, value interface{}) bool {
 		h := value.(DeviceSession)
 		h.stopChan <- true
+		fmt.Println("[INFO] 已移除" + key.(string))
 		return true
 	})
 
+	fmt.Println("[INFO] 重启TCP")
 	go RunDeviceTCP()
 }
 
 func RunDeviceTCP() {
 	// go testStatus()
-	listener, err := net.Listen(NETWORK, ADDRESS)
-	if err != nil {
-		fmt.Println("[FAIL]", err)
-		return
-	}
+	listener, _ = net.Listen(NETWORK, ADDRESS)
+
 	// defer listener.Close()
 	for {
 		conn, err := listener.Accept()

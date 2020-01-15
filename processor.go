@@ -29,7 +29,7 @@ func HandleProcessor(conn net.Conn) {
 	//	fmt.Println(data)
 	//})
 
-	for {
+	//for {
 		select {
 		case stop := <-b.stopChan:
 			// pick out
@@ -49,5 +49,5 @@ func HandleProcessor(conn net.Conn) {
 				break
 			}
 		}
-	}
+	//}
 }
