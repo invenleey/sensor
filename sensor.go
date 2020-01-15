@@ -85,6 +85,15 @@ func (i Sensor) SetDefault() {
 //
 //}
 
+var StopSystem chan bool
+
+func WaitSystem() {
+	select {
+	case <-StopSystem:
+		break
+	}
+}
+
 // Freedom map
 var InfoMK = map[string][]byte{
 	"ReadFunc":  {0x03},
