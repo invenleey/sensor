@@ -234,12 +234,11 @@ func TaskSensorPush(data TaskData) {
 	queueChannel := data["Channel"].(chan TaskSensorBody)
 	defer func() {
 		if recover() != nil {
-			fmt.Println("[INFO] 通道已关闭, 发送失败")
+			fmt.Println("[INFO] 通道已关闭, 尝试再次关闭任务")
 			key := TaskSensorKey{body.SensorAddr, body.SensorAttachIP, body.Type}
 			if err := GetTimeWheel().RemoveTask(key); err != nil {
-				fmt.Println("[WARN] X + X + X")
+				fmt.Println("[WARN] 尝试失败, 不存在的任务Key")
 			}
-
 		}
 	}()
 	queueChannel <- body
@@ -339,21 +338,25 @@ func GetTimeWheel() *TimeWheel {
 
 /*
  * 定时任务设置
+ * @return ch 给processor进行回收
  */
-func TaskSetup(attachIP string) chan TaskSensorBody{
+func TaskSetup(attachIP string) chan TaskSensorBody {
 	ch := make(chan TaskSensorBody, 10)
 	// 这个pop每个dtu有且只有一个, 生命周期应与tcp挂钩
 	ds, _ := GetDeviceSession(attachIP)
 	go ds.TaskSensorPop(ch)
 	// 此处得到attach到该dtu的至少0个, 至多3个传感器的参数
 
+
 	// 为attach的每一个传感器设置定时任务
 	for _, v := range GetLocalDevicesInstance().GetLocalSensorList(attachIP) {
+		v.ScanSensorStatus()
 		if err := v.CreateTask(-1, ch); err != nil {
 			continue
 		}
 		fmt.Printf("[INFO] ID:%s 进入队列\n", v.SensorID)
 	}
+
 	return ch
 }
 
@@ -361,29 +364,25 @@ func TaskSetup(attachIP string) chan TaskSensorBody{
  * 扫描attach(下位机)内传感器状态
  * 在processor内的for进行首次判断
  */
-func ScanSensorStatus(attach string) {
-	// 传感器列表
-	sensors := GetLocalDevicesInstance().GetLocalSensorList(attach)
-	// session
-	ds, _ := GetDeviceSession(attach)
-	for _, v := range sensors {
-		var sr []byte
-		// 设备ADDR
-		sr = append(sr, v.Addr)
-		// 指令功能码
-		sr = append(sr, InfoMK["ReadFunc"]...)
-		// 寄存器地址和数量
-		sr = append(sr, InfoMK["RAddr"]...)
-		// CRC_ModBus
-		sr = append(sr, CreateCRC(sr)...)
-		if _, err := ds.SendToSensor(sr); err != nil {
-			// 超时
-			v.Status = STATUS_DETACH
-		} else {
-			// TODO: 最后记得把fmt换成日志log输出
-			v.Status = STATUS_NORMAL
-			fmt.Println("[INFO] 设备连接成功" + v.SensorID + " FROM " + v.Attach)
-		}
+func (ls *LocalSensorInformation) ScanSensorStatus() {
+	ds, _ := GetDeviceSession(ls.Attach)
+	var sr []byte
+	// 设备ADDR
+	sr = append(sr, ls.Addr)
+	// 指令功能码
+	sr = append(sr, InfoMK["ReadFunc"]...)
+	// 寄存器地址和数量
+	sr = append(sr, InfoMK["RAddr"]...)
+	// CRC_ModBus
+	sr = append(sr, CreateCRC(sr)...)
+	if _, err := ds.SendToSensor(sr); err != nil {
+		// 超时
+		ls.Status = STATUS_DETACH
+		count.AddErrorOperationBan(ls.SensorID)
+	} else {
+		// TODO: 最后记得把fmt换成日志log输出
+		ls.Status = STATUS_NORMAL
+		fmt.Println("[INFO] 传感器设备连接成功" + ls.SensorID + " FROM " + ls.Attach)
 	}
 }
 
