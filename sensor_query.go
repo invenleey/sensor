@@ -251,39 +251,14 @@ func TaskSensorPush(data TaskData) {
  */
 func (ds *DeviceSession) TaskSensorPop(queueChannel chan TaskSensorBody) {
 	var wg sync.WaitGroup
-	//for {
-	//	v, ok := <-queueChannel
-	//	if !ok {
-	//		continue
-	//	} else {
-	//		// 确保数据有序进行
-	//		wg.Add(1)
-	//		DefaultSensorHandler(v, &wg)
-	//		// 等待上一个任务完成
-	//		wg.Wait()
-	//	}
-	//}
-	for {
-		select {
-		case v, ok := <-queueChannel:
-			if !ok {
-				fmt.Println("[INFO] POP已更新")
-				return
-			} else {
-				wg.Add(1)
-				DefaultSensorHandler(v, &wg)
-				wg.Wait()
-				break
-			}
-		}
-		//case stop := <-ds.stopChan:
-		//	if stop {
-		//		fmt.Println("[INFO] POP已更新")
-		//		return
-		//		clos
-		//	}
-		//}
+
+	for v := range queueChannel {
+		wg.Add(1)
+		DefaultSensorHandler(v, &wg)
+		wg.Wait()
 	}
+
+	fmt.Println("[INFO] POP成功关闭")
 }
 
 /**
@@ -347,14 +322,13 @@ func TaskSetup(attachIP string) chan TaskSensorBody {
 	go ds.TaskSensorPop(ch)
 	// 此处得到attach到该dtu的至少0个, 至多3个传感器的参数
 
-
 	// 为attach的每一个传感器设置定时任务
 	for _, v := range GetLocalDevicesInstance().GetLocalSensorList(attachIP) {
 		v.ScanSensorStatus()
 		if err := v.CreateTask(-1, ch); err != nil {
 			continue
 		}
-		fmt.Printf("[INFO] ID:%s 进入队列\n", v.SensorID)
+		fmt.Println("[INFO] 进入队列 ID:" + v.SensorID)
 	}
 
 	return ch
@@ -365,6 +339,7 @@ func TaskSetup(attachIP string) chan TaskSensorBody {
  * 在processor内的for进行首次判断
  */
 func (ls *LocalSensorInformation) ScanSensorStatus() {
+	fmt.Println("[INFO] 等待连接 ID:" + ls.SensorID + " FROM " + ls.Attach)
 	ds, _ := GetDeviceSession(ls.Attach)
 	var sr []byte
 	// 设备ADDR
@@ -379,10 +354,11 @@ func (ls *LocalSensorInformation) ScanSensorStatus() {
 		// 超时
 		ls.Status = STATUS_DETACH
 		count.AddErrorOperationBan(ls.SensorID)
+		fmt.Println("[WARN] 连接超时 ID:" + ls.SensorID + " FROM " + ls.Attach)
 	} else {
 		// TODO: 最后记得把fmt换成日志log输出
 		ls.Status = STATUS_NORMAL
-		fmt.Println("[INFO] 传感器设备连接成功" + ls.SensorID + " FROM " + ls.Attach)
+		fmt.Println("[INFO] 连接成功 ID:" + ls.SensorID + " FROM " + ls.Attach)
 	}
 }
 
