@@ -358,6 +358,7 @@ func (ls *LocalSensorInformation) ScanSensorStatus() {
 	} else {
 		// TODO: 最后记得把fmt换成日志log输出
 		ls.Status = STATUS_NORMAL
+		count.ClsErrorCount(ls.SensorID)
 		fmt.Println("[INFO] 连接成功 ID:" + ls.SensorID + " FROM " + ls.Attach)
 	}
 }

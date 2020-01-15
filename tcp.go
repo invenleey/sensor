@@ -12,7 +12,7 @@ const (
 )
 
 // sensor status code testing
-func testStatus()  {
+func testStatus() {
 	var i = 0
 	for i = 1; i > 0; i++ {
 		GetLocalDevicesInstance()
@@ -22,24 +22,51 @@ func testStatus()  {
 	}
 }
 
+var listener net.Listener
+
 /**
- * 对传感器的服务重启
- * 尽量避免重启解决问题, 需要重启说明程序不够完美
+ * 关闭TCP
  */
+func StopDeviceTCP() {
+	listener.Close()
+}
+
+/**
+ * 重启设备TCP
+ */
+func RestartDeviceTCP() {
+	listener.Close()
+	go RunDeviceTCP()
+
+}
+
+/**
+ * 重启System
+ */
+func RestartTCPSystem() {
+	listener.Close()
+	s := GetDeviceSessions()
+	s.Range(func(key, value interface{}) bool {
+		h := value.(DeviceSession)
+		h.stopChan <- true
+		return true
+	})
+
+	go RunDeviceTCP()
+}
 
 func RunDeviceTCP() {
-	InitInfoMK()
-	go testStatus()
+	// go testStatus()
 	listener, err := net.Listen(NETWORK, ADDRESS)
 	if err != nil {
 		fmt.Println("[FAIL]", err)
 		return
 	}
-	defer listener.Close()
+	// defer listener.Close()
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			fmt.Println("[FAIL]", err)
+			fmt.Println("[FAIL] " + "退出TCP")
 			return
 		}
 		go HandleProcessor(conn)

@@ -9,7 +9,6 @@ import (
 	"sensor"
 )
 
-
 func main() {
 	// 订阅示例
 	// 上级: GO -> MQTT -> GO
@@ -23,7 +22,12 @@ func main() {
 	// Status&&Exception动态更新
 	sensor.MQTTMapping("sensor/action/clear", sensor.ClearExceptionHandler)
 
+	// 重启
+	sensor.MQTTMapping("sensor/action/bbbb", sensor.FncTest)
 
+	client, _ := sensor.GetMQTTInstance()
+	client.Publish("sensor/action/bbbb", 1, false, 1)
+	// token.Wait()
 
 	// 服务开启示例
 	// 下级: GO -> DTU -> Sensor

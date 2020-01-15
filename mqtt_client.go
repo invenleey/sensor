@@ -28,6 +28,7 @@ func GetMQTTInstance() (mqtt.Client, error) {
 			return nil, err
 		} else {
 			client = ins
+			fmt.Println("[CONN] 已连接到MQ: " + host)
 		}
 	}
 	return client, nil

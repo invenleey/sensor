@@ -177,7 +177,9 @@ func GetConfigTest() *LocalDeviceDetail {
 // 本地传感器信息()
 var localDeviceDetail *LocalDeviceDetail = nil
 
-// 加载参数
+/**
+ * 参数加载
+ */
 func GetLocalDevicesInstance() *LocalDeviceDetail {
 	if localDeviceDetail == nil {
 		localDeviceDetail = GetConfigTest()
@@ -185,6 +187,23 @@ func GetLocalDevicesInstance() *LocalDeviceDetail {
 	} else {
 		return localDeviceDetail
 	}
+}
+
+/**
+ * 重新加载
+ */
+func ReloadDeviceInstance() *LocalDeviceDetail {
+	localDeviceDetail = GetConfigTest()
+	return localDeviceDetail
+}
+
+/**
+ * 替换本地信息文件, 而不是重新在CONF中加载
+ * 这个文件可能来源于上位机
+ *
+ */
+func (dl *LocalDeviceDetail) ReplaceLocalDeviceInstance() {
+	localDeviceDetail = dl
 }
 
 const configFileSizeLimit = 10 << 20
