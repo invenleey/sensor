@@ -7,18 +7,19 @@ import (
 )
 
 func HandleProcessor(conn net.Conn) {
-	dtuIpv4 := strings.Split(conn.RemoteAddr().String(), ":")[0]
-
-	fmt.Println("[CONN]", conn.RemoteAddr())
 	defer conn.Close()
-	// session
 	b := RegDeviceSession(conn)
-	// setup time wheel
-	ch := TaskSetup(dtuIpv4)
 
 	go b.ReadConn()
 	go b.WriteConn()
 	// go b.HeartBeating(20)
+
+	dtuIpv4 := strings.Split(conn.RemoteAddr().String(), ":")[0]
+
+	fmt.Println("[CONN]", conn.RemoteAddr())
+
+	// setup time wheel
+	ch := TaskSetup(dtuIpv4)
 
 	// fmt.Println("already connected:", ShowNodeIPs())
 
@@ -28,7 +29,7 @@ func HandleProcessor(conn net.Conn) {
 	//	fmt.Println(data)
 	//})
 
-	for {
+	//for {
 		select {
 		case stop := <-b.stopChan:
 			// pick out
@@ -44,8 +45,9 @@ func HandleProcessor(conn net.Conn) {
 
 				// 关闭任务通道
 				close(ch)
+
 				break
 			}
 		}
-	}
+	//}
 }

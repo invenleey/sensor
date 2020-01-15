@@ -68,7 +68,7 @@ func ChangeAttachIPHandler(client mqtt.Client, message mqtt.Message) {
 }
 
 /*
- * 更改当前节点上的CONFIG文件
+ * 更改当前下位机上的CONFIG文件
  * Topic sensor/setting/all
  */
 func SettingConfigHandler(client mqtt.Client, message mqtt.Message) {
@@ -86,15 +86,19 @@ func SettingConfigHandler(client mqtt.Client, message mqtt.Message) {
 		fmt.Println("[FAIL] CONFIG保存时错误")
 		return
 	}
-	// fmt.Println("[INFO] CONFIG已更新")
 
+	jsonConfig.ReplaceLocalDeviceInstance()
+	RestartDeviceTCP()
+	// fmt.Println("[INFO] CONFIG已更新")
 }
 
 /**
- * 重启服务
+ * 重启服务 + 重新加载数据
  */
 func RestartHandler(client mqtt.Client, message mqtt.Message) {
-
+	fmt.Println("[INFO] 正在重启TCP")
+	ReloadDeviceInstance()
+	RestartTCPSystem()
 }
 
 /**

@@ -85,48 +85,32 @@ func (i Sensor) SetDefault() {
 //
 //}
 
-// Freedom map
-var InfoMK map[string][]byte
+var StopSystem chan bool
 
-func InitInfoMK() {
-	InfoMK = make(map[string][]byte)
-	// Function Code Type Map
-	// Read 0x03
-	// Write 0x06
-	InfoMK["ReadFunc"] = []byte{0x03}
-	InfoMK["WriteFunc"] = []byte{0x06}
-
-	InfoMK["RMeasure"] = []byte{0x00, 0x00, 0x00, 0x04}
-	InfoMK["WOxygen"] = []byte{0x00, 0x04, 0x00, 0x01}
-	InfoMK["WZero"] = []byte{0x10, 0x00, 0x00, 0x01}
-	InfoMK["WTilt"] = []byte{0x10, 0x04, 0x00, 0x01}
-
-	InfoMK["RZero"] = []byte{010, 0x06, 0x00, 0x01}
-	InfoMK["RTilt"] = []byte{0x10, 0x08, 0x00, 0x01}
-
-	InfoMK["RAddr"] = []byte{0x20, 0x02, 0x00, 0x01}
-	InfoMK["WFactory"] = []byte{0x20, 0x20, 0x00, 0x01}
-
+func WaitSystem() {
+	select {
+	case <-StopSystem:
+		break
+	}
 }
 
-// Function Code Type Map
-// Read 0x03
-// Write 0x06
-//var ReadFunc = []byte{0x03}
-//var WriteFunc = []byte{0x06}
-//
-//// Register Address include reg count
-//var RRegMeasure = []byte{0x00, 0x00, 0x00, 0x04}
-//var WRegOxygen = []byte{0x10, 0x04}
-//var WRegZero = []byte{010, 0x00}
-//var WRegTilt = []byte{0x10, 0x04}
-//
-//var RRegZero = []byte{010, 0x06}
-//var RRegTilt = []byte{0x10, 0x08}
-//
-//var ARegAddr = []byte{0x20, 0x02}
-//var WRegFactory = []byte{0x20, 0x20}
-//
+// Freedom map
+var InfoMK = map[string][]byte{
+	"ReadFunc":  {0x03},
+	"WriteFunc": {0x06},
+
+	"RMeasure": {0x00, 0x00, 0x00, 0x04},
+	"WOxygen":  {0x00, 0x04, 0x00, 0x01},
+	"WZero":    {0x10, 0x00, 0x00, 0x01},
+	"WTilt":    {0x10, 0x04, 0x00, 0x01},
+
+	"RZero": {010, 0x06, 0x00, 0x01},
+	"RTilt": {0x10, 0x08, 0x00, 0x01},
+
+	"RAddr":    {0x20, 0x02, 0x00, 0x01},
+	"WFactory": {0x20, 0x20, 0x00, 0x01},
+}
+
 //var request []byte
 
 //// Measure(read)

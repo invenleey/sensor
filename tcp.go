@@ -7,12 +7,12 @@ import (
 )
 
 const (
-	Network = "tcp"
-	Address = ":6564"
+	NETWORK = "tcp"
+	ADDRESS = ":6564"
 )
 
 // sensor status code testing
-func testStatus()  {
+func testStatus() {
 	var i = 0
 	for i = 1; i > 0; i++ {
 		GetLocalDevicesInstance()
@@ -22,23 +22,50 @@ func testStatus()  {
 	}
 }
 
-func RestartDevice() {
+var listener net.Listener
+
+/**
+ * 关闭TCP
+ */
+func StopDeviceTCP() {
+	listener.Close()
+}
+
+/**
+ * 重启设备TCP
+ */
+func RestartDeviceTCP() {
+	listener.Close()
+	go RunDeviceTCP()
 
 }
 
+/**
+ * 重启System
+ */
+func RestartTCPSystem() {
+	listener.Close()
+	s := GetDeviceSessions()
+	s.Range(func(key, value interface{}) bool {
+		h := value.(DeviceSession)
+		h.stopChan <- true
+		fmt.Println("[INFO] 已移除" + key.(string))
+		return true
+	})
+
+	fmt.Println("[INFO] 重启TCP")
+	go RunDeviceTCP()
+}
+
 func RunDeviceTCP() {
-	InitInfoMK()
-	go testStatus()
-	listener, err := net.Listen(Network, Address)
-	if err != nil {
-		fmt.Println("[FAIL]", err)
-		return
-	}
-	defer listener.Close()
+	// go testStatus()
+	listener, _ = net.Listen(NETWORK, ADDRESS)
+
+	// defer listener.Close()
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			fmt.Println("[FAIL]", err)
+			fmt.Println("[FAIL] " + "退出TCP")
 			return
 		}
 		go HandleProcessor(conn)
