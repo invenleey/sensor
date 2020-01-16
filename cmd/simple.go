@@ -10,8 +10,7 @@ import (
 )
 
 func main() {
-	// 订阅示例
-	// 上级: GO -> MQTT -> GO
+	// 订阅示例: 下位 -> MQTT -> 上位
 
 	// 测量
 	sensor.MQTTMapping("sensor/oxygen/measure", sensor.FncTest)
@@ -25,9 +24,6 @@ func main() {
 	// 重启
 	sensor.MQTTMapping("sensor/action/restart", sensor.RestartHandler)
 
-	// 服务开启示例
-	// 下级: GO -> DTU -> Sensor
+	// 服务示例: 下位 -> DTU -> Sensor
 	sensor.RunDeviceTCP()
-
-	sensor.WaitSystem()
 }

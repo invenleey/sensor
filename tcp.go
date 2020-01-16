@@ -66,8 +66,9 @@ func RunDeviceTCP() {
 		conn, err := listener.Accept()
 		if err != nil {
 			fmt.Println("[FAIL] " + "退出TCP")
-			return
+			break
 		}
 		go HandleProcessor(conn)
 	}
+	WaitSystem()
 }
