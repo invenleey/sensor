@@ -24,4 +24,7 @@ func SensorMapping() {
 	// 重启
 	sensor.MQTTMapping("sensor/action/restart", sensor.RestartHandler)
 
+	// 状态开关
+	sensor.MQTTMapping("sensor/action/switch", sensor.SwitchSensorHandler)
+	
 }
