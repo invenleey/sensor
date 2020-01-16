@@ -30,6 +30,8 @@ rabbitmq:3-management
 rabbitmq-plugins enable rabbitmq_mqtt
 ```
 
+#### 表格
+
 ##### mqtt_client
 
 | 函数名 | 描述                    |  返回值 |
@@ -97,7 +99,13 @@ rabbitmq-plugins enable rabbitmq_mqtt
 
 
 #### 使用
-
+使用 `MQTTMapping(topic string, callback mqtt.MessageHandler)` 订阅服务, 如下:
+```golang
+sensor.MQTTMapping("sensor/action/clear", sensor.ClearExceptionHandler)
+```
+    <?php
+      
+    ?>
 
 文档建设中...
 
