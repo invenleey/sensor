@@ -100,7 +100,7 @@ rabbitmq-plugins enable rabbitmq_mqtt
 
 #### 使用
 使用 `MQTTMapping(topic string, callback mqtt.MessageHandler)` 订阅服务, 如下:
-```golang
+```go
 sensor.MQTTMapping("sensor/action/clear", sensor.ClearExceptionHandler)
 ```
     <?php
