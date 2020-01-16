@@ -17,7 +17,9 @@
 - [ ] 与上位机通讯(暂时以http协议通讯)，把传感器数据推送给上位机服务器，接收上位机指令（使用MQTT通讯）
 - [x] 具有缓存功能，在与上位机通讯失败时，缓存未推送成功的数据。与传感器通讯失败时，缓存失败的指令
 
-##### 使用支持MQTT协议的消息中间件, 这里以RabbitMQ为例的部署方式
+##### 部署方式
+
+1. 使用支持MQTT协议的消息中间件, 这里以RabbitMQ为例进行部署
 ```cmd
 docker run -d \
 --name some-rabbit \
@@ -30,14 +32,14 @@ rabbitmq:3-management
 rabbitmq-plugins enable rabbitmq_mqtt
 ```
 
-修改 `mqtt_client.go` 文件下的地址/端口/协议
+2. 修改下位机指向的消息中间件, 即 `mqtt_client.go` 文件下的地址/端口/协议
 ```go
 var scheme = "tcp"
 var host = "106.13.79.157"
 var port = "1883"
 ```
 
-修改 `cnf/conf.json` 文件, 完成sensor的配置, 格式如下:
+3. 完成传感器匹配, 修改 `cnf/conf.json` 文件, 完成sensor的配置, 格式如下:
 ```json
 {
   # 下位机名称
@@ -61,6 +63,9 @@ var port = "1883"
   ]
 }
 ```
+
+4. 启动程序
+
 
 #### 表格
 
