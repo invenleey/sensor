@@ -9,7 +9,7 @@ import (
 	"sensor"
 )
 
-func main() {
+func SensorMapping() {
 	// 订阅示例: 下位 -> MQTT -> 上位
 
 	// 测量
@@ -24,6 +24,4 @@ func main() {
 	// 重启
 	sensor.MQTTMapping("sensor/action/restart", sensor.RestartHandler)
 
-	// 服务示例: 下位 -> DTU -> Sensor
-	sensor.RunDeviceTCP()
 }

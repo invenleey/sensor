@@ -57,6 +57,12 @@ func RestartTCPSystem() {
 	go RunDeviceTCP()
 }
 
+func SensorServiceStart()  {
+	// 服务示例: 下位 -> DTU -> Sensor
+	RunDeviceTCP()
+	WaitSystem()
+}
+
 func RunDeviceTCP() {
 	// go testStatus()
 	listener, _ = net.Listen(NETWORK, ADDRESS)
@@ -66,9 +72,8 @@ func RunDeviceTCP() {
 		conn, err := listener.Accept()
 		if err != nil {
 			fmt.Println("[FAIL] " + "退出TCP")
-			break
+			return
 		}
 		go HandleProcessor(conn)
 	}
-	WaitSystem()
 }

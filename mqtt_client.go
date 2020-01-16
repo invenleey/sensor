@@ -47,6 +47,7 @@ func pMQTTClient() (mqtt.Client, error) {
 
 	c := mqtt.NewClient(opts)
 	if token := c.Connect(); token.Wait() && token.Error() != nil {
+		fmt.Println("[FAIL] MQTT Broker connect failed")
 		return nil, token.Error()
 	}
 	return c, nil
@@ -54,7 +55,7 @@ func pMQTTClient() (mqtt.Client, error) {
 
 func MQTTMapping(topic string, callback mqtt.MessageHandler) bool {
 	if mq, err := GetMQTTInstance(); err != nil {
-		fmt.Println("[FAIL] MQTT代理连接失败")
+		return false
 	} else {
 		if token := mq.Subscribe(topic, 1, callback); token.Wait() && token.Error() != nil {
 			fmt.Printf("subscribe failed by %s\n", topic)
@@ -63,4 +64,13 @@ func MQTTMapping(topic string, callback mqtt.MessageHandler) bool {
 	}
 	fmt.Printf("subscribed %s successfully\n", topic)
 	return true
+}
+
+func MQTTPublish(topic string, payload interface{}) {
+	if mq, err := GetMQTTInstance(); err != nil {
+		fmt.Println("[FAIL] 发布失败")
+	} else {
+		token := mq.Publish(topic, 1, false, payload)
+		token.Wait()
+	}
 }

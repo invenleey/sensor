@@ -119,7 +119,7 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 		b, _ := GetDeviceSession(body.SensorAttachIP)
 		// 合成地址
 		body.CreateMeasureRequest()
-		fmt.Printf("[INFO] 测量请求 -> 传感器设备ID %s | 设备地址 %d | 任务类型 %d | 请求数据 %b |\n", body.SensorID, body.SensorAddr, body.Type, body.RequestData)
+		fmt.Printf("[INFO] 测量请求 ID:%s 设备地址:%d 任务类型:%d 请求数据:%b\n", body.SensorID, body.SensorAddr, body.Type, body.RequestData)
 		// 向传感器发送对应测量请求
 		p, err := b.MeasureRequest(body.RequestData, []string{"Oxygen", "Temp"})
 		if err != nil {
@@ -130,7 +130,7 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 			if count.AddErrorOperation(body.SensorID) > 3 {
 				v.Status = STATUS_DETACH
 			}
-			fmt.Printf("[WARN] %s发生第%d次错误, 等待%s后重试\n", body.SensorID, count.GetErrorCount(body.SensorID), count.GetRetryTime(body.SensorID))
+			fmt.Printf("[WARN] 查询错误 ID:%s 发生第%d次错误 恢复时间: %s\n", body.SensorID, count.GetErrorCount(body.SensorID), count.GetRetryTime(body.SensorID).Format("2006/1/2 15:04:05"))
 			// v.Status = STATUS_DETACH
 			// waitGroup完成
 
