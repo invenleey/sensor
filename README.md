@@ -30,6 +30,38 @@ rabbitmq:3-management
 rabbitmq-plugins enable rabbitmq_mqtt
 ```
 
+修改 `mqtt_client.go` 文件下的地址/端口/协议
+```go
+var scheme = "tcp"
+var host = "106.13.79.157"
+var port = "1883"
+```
+
+修改 `cnf/conf.json` 文件, 完成sensor的配置, 格式如下:
+```json
+{
+  # 下位机名称
+  "name": "示例收集器名",
+  # MQTT IP
+  # MQTT PORT
+  # MQTT SCHME
+  "localSensorInformation": [
+    {
+      # 传感器物理地址
+      "addr": 6,
+      # 传感器类型, 类型表在sensor_query.go下
+      "type": 0,
+      # 传感器依附的DTU IP
+      "attach": "172.20.10.4",
+      # 测量间隔时间
+      "interval": 10,
+      # 传感器ID
+      "sensorID": "7eb220dd-6127-58c7-8663-bf2f55371b78"
+    }
+  ]
+}
+```
+
 #### 表格
 
 ##### mqtt_client
