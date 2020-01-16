@@ -37,7 +37,7 @@ rabbitmq-plugins enable rabbitmq_mqtt
 | `GetMQTTInstance()`| 获得一个MQTT的连接 | mqtt.Client, error |
 
 
-#####LocalSensorInformation
+##### LocalSensorInformation
 
 | 成员变量      | 描述 |
 | --------- | -----:|
@@ -58,7 +58,7 @@ rabbitmq-plugins enable rabbitmq_mqtt
 | `RemoveTaskHandler()`| 移除自定义任务 | bool |
 
 
-#####LocalDeviceList
+##### LocalDeviceList
 
 | 成员变量      | 描述 |
 | --------- | -----:|
@@ -72,7 +72,7 @@ rabbitmq-plugins enable rabbitmq_mqtt
 | `GetLocalSensorList(attachIP string)`| 获取相关传感器数据列表 | []LocalSensorInformation |
 
 
-#####TaskSensorKey
+##### TaskSensorKey
 
 | 成员变量      | 描述 |
 | --------- | -----:|
@@ -81,7 +81,7 @@ rabbitmq-plugins enable rabbitmq_mqtt
 | Type     |   指令类型 |
 
 
-#####TaskSensorBody
+##### TaskSensorBody
 
 | 成员变量      | 描述 |
 | --------- | -----:|
