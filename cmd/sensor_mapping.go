@@ -26,5 +26,5 @@ func SensorMapping() {
 
 	// 状态开关
 	sensor.MQTTMapping("sensor/action/switch", sensor.SwitchSensorHandler)
-	
+
 }
