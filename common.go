@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gopkg.in/mgo.v2/bson"
 	"log"
 	"math"
 	"os"
@@ -164,8 +165,44 @@ type LocalSensorInformation struct {
 
 // 下位机参数
 type LocalDeviceDetail struct {
-	Name                   string                    `json:"name"`                   // 收集器名称
+	Name           string  `json:"name"`             // 收集器名称
+	BrokerIP       string  `json:"broker_ip"`        // 中间件地址
+	BrokerPort     string  `json:"broker_port"`      // 中间件端口
+	BrokerScheme   string  `json:"broker_scheme"`    // 中间件协议
+	BrokerUsername string  `json:"broker_username"`  // 中间件用户名
+	BrokerPassword string  `json:"broker_password"`  // 中间件密码
+	BrokerClientID *string `json:"broker_client_id"` // ClientID
+
 	LocalSensorInformation []*LocalSensorInformation `json:"localSensorInformation"` // 传感器集合
+}
+
+func GetBrokerClientID() string {
+	id := GetLocalDevicesInstance().BrokerClientID
+	if id == nil {
+		return bson.NewObjectId().String()
+	} else {
+		return *id
+	}
+}
+
+func GetBrokerPassword() string {
+	return GetLocalDevicesInstance().BrokerPassword
+}
+
+func GetBrokerUsername() string {
+	return GetLocalDevicesInstance().BrokerUsername
+}
+
+func GetBrokerIP() string {
+	return GetLocalDevicesInstance().BrokerIP
+}
+
+func GetBrokerPort() string {
+	return GetLocalDevicesInstance().BrokerPort
+}
+
+func GetBrokerScheme() string {
+	return GetLocalDevicesInstance().BrokerScheme
 }
 
 // 加载测试

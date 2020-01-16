@@ -32,6 +32,24 @@ type SensorAction struct {
 	Data      []byte `json:"data"`
 }
 
+/**
+ * 传感器开关控制
+ * @Topic sensor/action/switch
+ */
+func SwitchSensorHandler(client mqtt.Client, message mqtt.Message) {
+	sa, _ := RequestMap(message)
+	ld, _ := GetLocalSensor(sa.SensorID)
+	switch sa.Operation {
+	case count.SWITCH_CLOSE:
+		ld.Close()
+		break
+	case count.SWITCH_OPEN:
+		ld.Open()
+		break
+	default:
+	}
+}
+
 /*
  * 清除错误次数&&状态
  * @Topic sensor/action/clear
@@ -43,13 +61,13 @@ func ClearExceptionHandler(client mqtt.Client, message mqtt.Message) {
 	case count.CLEAR_ALL_EXCEPTION:
 		count.ClsAll()
 		for _, v := range GetLocalDevicesInstance().LocalSensorInformation {
-			v.Status = STATUS_NORMAL
+			v.Open()
 		}
 		break
 	case count.CLEAR_ONE_EXCEPTION:
 		count.ClsErrorCount(sa.SensorID)
 		ld, _ := GetLocalSensor(sa.SensorID)
-		ld.Status = STATUS_NORMAL
+		ld.Open()
 		break
 	default:
 	}

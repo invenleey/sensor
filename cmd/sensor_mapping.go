@@ -9,9 +9,8 @@ import (
 	"sensor"
 )
 
-func main() {
-	// 订阅示例
-	// 上级: GO -> MQTT -> GO
+func SensorMapping() {
+	// 订阅示例: 下位 -> MQTT -> 上位
 
 	// 测量
 	sensor.MQTTMapping("sensor/oxygen/measure", sensor.FncTest)
@@ -25,9 +24,7 @@ func main() {
 	// 重启
 	sensor.MQTTMapping("sensor/action/restart", sensor.RestartHandler)
 
-	// 服务开启示例
-	// 下级: GO -> DTU -> Sensor
-	sensor.RunDeviceTCP()
+	// 状态开关
+	sensor.MQTTMapping("sensor/action/switch", sensor.SwitchSensorHandler)
 
-	sensor.WaitSystem()
 }

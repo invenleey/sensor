@@ -105,6 +105,13 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 		return
 	}
 
+	// 关闭
+	ls, _ := GetLocalSensor(body.SensorID)
+	if ls.IsClosed() {
+		wg.Done()
+		return
+	}
+
 	//if value, err := GetLocalSensor(body.SensorID); err != nil {
 	//	fmt.Println("[FAIL] key not found ", err)
 	//} else if value.Status == STATUS_DETACH || value.Status == STATUS_CLOSED {
@@ -119,7 +126,7 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 		b, _ := GetDeviceSession(body.SensorAttachIP)
 		// 合成地址
 		body.CreateMeasureRequest()
-		fmt.Printf("[INFO] 测量请求 -> 传感器设备ID %s | 设备地址 %d | 任务类型 %d | 请求数据 %b |\n", body.SensorID, body.SensorAddr, body.Type, body.RequestData)
+		fmt.Printf("[INFO] 测量请求 ID:%s 设备地址:%d 任务类型:%d 请求数据:%b\n", body.SensorID, body.SensorAddr, body.Type, body.RequestData)
 		// 向传感器发送对应测量请求
 		p, err := b.MeasureRequest(body.RequestData, []string{"Oxygen", "Temp"})
 		if err != nil {
@@ -130,7 +137,7 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 			if count.AddErrorOperation(body.SensorID) > 3 {
 				v.Status = STATUS_DETACH
 			}
-			fmt.Printf("[WARN] %s发生第%d次错误, 等待%s后重试\n", body.SensorID, count.GetErrorCount(body.SensorID), count.GetRetryTime(body.SensorID))
+			fmt.Printf("[WARN] 查询错误 ID:%s 发生第%d次错误 恢复时间: %s\n", body.SensorID, count.GetErrorCount(body.SensorID), count.GetRetryTime(body.SensorID).Format("2006/1/2 15:04:05"))
 			// v.Status = STATUS_DETACH
 			// waitGroup完成
 
@@ -374,4 +381,23 @@ func GetLocalSensor(sensorID string) (*LocalSensorInformation, error) {
 		}
 	}
 	return nil, errors.New("not find sensorID for this device")
+}
+
+func (ls *LocalSensorInformation) IsClosed() bool {
+	if ls.Status == STATUS_CLOSED {
+		return true
+	}
+	return false
+}
+
+func (ls *LocalSensorInformation) Open() {
+	ls.Status = STATUS_NORMAL
+}
+
+func (ls *LocalSensorInformation) Close() {
+	ls.Status = STATUS_CLOSED
+}
+
+func (ls *LocalSensorInformation) Detach() {
+	ls.Status = STATUS_DETACH
 }

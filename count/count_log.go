@@ -114,6 +114,9 @@ func ClsErrorCount(sensorID string) {
 
 const CLEAR_ALL_EXCEPTION = "all"
 const CLEAR_ONE_EXCEPTION = "one"
+const SWITCH_CLOSE = "close"
+const SWITCH_OPEN = "open"
+
 /**
  * GC回收吧
  */
