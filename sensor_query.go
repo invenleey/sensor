@@ -105,6 +105,13 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 		return
 	}
 
+	// 关闭
+	ls, _ := GetLocalSensor(body.SensorID)
+	if ls.IsClosed() {
+		wg.Done()
+		return
+	}
+
 	//if value, err := GetLocalSensor(body.SensorID); err != nil {
 	//	fmt.Println("[FAIL] key not found ", err)
 	//} else if value.Status == STATUS_DETACH || value.Status == STATUS_CLOSED {
@@ -374,4 +381,23 @@ func GetLocalSensor(sensorID string) (*LocalSensorInformation, error) {
 		}
 	}
 	return nil, errors.New("not find sensorID for this device")
+}
+
+func (ls *LocalSensorInformation) IsClosed() bool {
+	if ls.Status == STATUS_CLOSED {
+		return true
+	}
+	return false
+}
+
+func (ls *LocalSensorInformation) Open() {
+	ls.Status = STATUS_NORMAL
+}
+
+func (ls *LocalSensorInformation) Close() {
+	ls.Status = STATUS_CLOSED
+}
+
+func (ls *LocalSensorInformation) Detach() {
+	ls.Status = STATUS_DETACH
 }
