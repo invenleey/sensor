@@ -1,8 +1,11 @@
 package main
 
-import "sensor"
+import (
+	"sensor"
+	"sensor/mq"
+)
 
 func main() {
-	SensorMapping()
+	mq.SensorMapping()
 	sensor.SensorServiceStart()
 }
