@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="651a59bc-957f-466d-b5b6-7e1bb7cecee5" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/pond_sensor.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/pond_sensor.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/sensor_mapping.go" beforeDir="false" afterPath="$PROJECT_DIR$/mq/sensor_mapping.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simple.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,9 +62,10 @@
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\sensor" />
-      <recent name="D:\sensor\mqtt" />
-      <recent name="D:\sensor\cnf" />
+      <recent name="D:\sensor\mq" />
       <recent name="D:\sensor\cmd" />
+      <recent name="D:\sensor\map" />
+      <recent name="D:\sensor\mqtt" />
     </key>
   </component>
   <component name="RunManager" selected="Go Build.go build sensor/cmd">
