@@ -42,6 +42,7 @@ rabbitmq-plugins enable rabbitmq_mqtt
 | 成员变量      | 描述 |
 | --------- | -----:|
 | TaskHandler     |   自定义传感器任务 |
+| Status | 状态 |
 | Addr  | 传感器设备地址 |
 | Type     |   传感器类型 |
 | Attach      |    传感器附着的透传设备 |
@@ -56,6 +57,8 @@ rabbitmq-plugins enable rabbitmq_mqtt
 | `UpdateTask(times int)`| 更新一个传感器任务 | error |
 | `AddTaskHandler(callback Job)`| 创建自定义任务 |  |
 | `RemoveTaskHandler()`| 移除自定义任务 | bool |
+| `Open()`| 开启传感器 |  |
+| `Close()`| 关闭传感器 |  |
 
 
 ##### LocalDeviceList
@@ -63,8 +66,6 @@ rabbitmq-plugins enable rabbitmq_mqtt
 | 成员变量      | 描述 |
 | --------- | -----:|
 | Name     |   透传设备名称 |
-| ID  | 透传设备地址 |
-| IP     |   透传设备IP |
 | LocalSensorInformation      |    传感器集合 |
 
 | 函数名 | 描述                    |  返回值 |
@@ -93,6 +94,10 @@ rabbitmq-plugins enable rabbitmq_mqtt
 | 函数名 | 描述                    |  返回值 |
 | ---------------------- | ------------------------------ |----------------------|
 | `CreateMeasureRequest()`| 创建测量请求数据 |  |
+
+
+#### 使用
+
 
 文档建设中...
 
