@@ -3,18 +3,17 @@ package sensor
 import (
 	"fmt"
 	"github.com/eclipse/paho.mqtt.golang"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // ws/ssl/tcp
-var scheme = "tcp"
-var host = "106.13.79.157"
-var port = "1883"
+// var scheme = "tcp"
+// var host = "106.13.79.157"
+// var port = "1883"
 
 // ClientID 随机acm0-bjd2-fdi1-am81
-var ClientID = bson.NewObjectId().String()
-var Username = "r3inb"
-var Password = "159463"
+// var ClientID = bson.NewObjectId().String()
+// var Username = "r3inb"
+// var Password = "159463"
 
 var defaultPublishHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	// drop
@@ -28,17 +27,20 @@ func GetMQTTInstance() (mqtt.Client, error) {
 			return nil, err
 		} else {
 			client = ins
-			fmt.Println("[CONN] 已连接到MQ: " + host)
+			fmt.Println("[CONN] 已连接到MQ: " + GetBrokerIP())
 		}
 	}
 	return client, nil
 }
 
 func pMQTTClient() (mqtt.Client, error) {
-	opts := mqtt.NewClientOptions().AddBroker(scheme + "://" + host + ":" + port).SetClientID(ClientID)
+	opts := mqtt.NewClientOptions()
+	opts.AddBroker(GetBrokerScheme() + "://" + GetBrokerIP() + ":" + GetBrokerPort())
+	// MQ ClientID
+	opts.SetClientID(GetBrokerClientID())
 	// MQ 账号/密码
-	opts.SetUsername(Username)
-	opts.SetPassword(Password)
+	opts.SetUsername(GetBrokerUsername())
+	opts.SetPassword(GetBrokerPassword())
 	// opts.SetKeepAlive(2 * time.Second)
 	// 默认消费方式
 	//opts.SetDefaultPublishHandler(defaultPublishHandler)

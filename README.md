@@ -32,11 +32,22 @@ rabbitmq:3-management
 rabbitmq-plugins enable rabbitmq_mqtt
 ```
 
-2. 修改下位机指向的消息中间件, 即 `mqtt_client.go` 文件下的地址/端口/协议
-```go
-var scheme = "tcp"
-var host = "106.13.79.157"
-var port = "1883"
+2. 修改下位机指向的消息中间件, 即 `cnf/conf.json` 文件下的地址/端口/协议等参数, 格式如下:
+```json
+{
+  # 中间件地址
+  "broker_ip": "106.13.79.157",
+  # 中间件端口
+  "broker_port": "1883",
+  # 中间件协议
+  "broker_scheme": "tcp",
+  # 中间件用户名
+  "broker_username": "r3inb",
+  # 中间件密码
+  "broker_password": "159463",
+  # 可缺省
+  # "broker_client_id": "",
+}
 ```
 
 3. 完成传感器匹配, 修改 `cnf/conf.json` 文件, 完成sensor的配置, 格式如下:
