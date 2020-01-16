@@ -99,21 +99,16 @@ rabbitmq-plugins enable rabbitmq_mqtt
 
 
 #### 使用
-使用 `MQTTMapping(topic string, callback mqtt.MessageHandler)` 订阅服务, 如下:
+
+使用 `MQTTMapping(topic string, callback mqtt.MessageHandler)` 进行主题订阅, 如下:
+在新增服务时, 新增 `mqtt.MessageHandler` 即可
 ```go
-sensor.MQTTMapping("sensor/action/clear", sensor.ClearExceptionHandler)
+    MQTTMapping("sensor/action/clear", sensor.ClearExceptionHandler)
 ```
-    <?php
-      
-    ?>
+
+使用 `MQTTPublish(topic string, payload interface{})` 进行主题发布
 
 文档建设中...
 
 备注: 
 l. 临时MQ后台 http://106.13.79.157:15672/ 账号/密码: admin (有效期至2020.02.06)
-2. 重构
-3. 读写协程
-4. 超时反馈 -> 传感器的状态标识
-5. 任务队列与连接的整合
-
-
