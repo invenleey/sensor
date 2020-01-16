@@ -72,6 +72,10 @@ func GetDeviceSession(addr string) (DeviceSession, error) {
 	}
 }
 
+func GetDeviceSessions() sync.Map {
+	return SessionsCollection
+}
+
 /**
  * show all device node ip in this -> lan
  * @return a string array include all node server ip

@@ -25,3 +25,10 @@ func TestSettingConfigHandler(t *testing.T) {
 	time.Sleep(time.Minute)
 
 }
+
+func TestRestartHandler(t *testing.T) {
+	client, _ := GetMQTTInstance()
+	client.Publish("sensor/action/bbbb", 1, false, 1)
+
+
+}

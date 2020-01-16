@@ -21,7 +21,26 @@ type SensorLog struct {
 }
 
 /**
- * 返回重试时间
+ * 绝对禁用
+ */
+func AddErrorOperationBan(sensorID string) int {
+	// 判断某个Key是否存在
+	if v, ok := sensorLog[sensorID]; ok {
+		v.errorTag = true
+		v.errorCount ++
+		return v.errorCount
+	} else {
+		s := SensorLog{}
+		s.sensorID = sensorID
+		sensorLog[sensorID] = &s
+		s.errorTag = true
+		s.errorCount = 1
+		return s.errorCount
+	}
+}
+
+/**
+ * 返回重试恢复时间点
  */
 func GetRetryTime(sensorID string) time.Time {
 	if v, ok := sensorLog[sensorID]; ok {
@@ -95,6 +114,9 @@ func ClsErrorCount(sensorID string) {
 
 const CLEAR_ALL_EXCEPTION = "all"
 const CLEAR_ONE_EXCEPTION = "one"
+const SWITCH_CLOSE = "close"
+const SWITCH_OPEN = "open"
+
 /**
  * GC回收吧
  */

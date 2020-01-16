@@ -32,6 +32,24 @@ type SensorAction struct {
 	Data      []byte `json:"data"`
 }
 
+/**
+ * 传感器开关控制
+ * @Topic sensor/action/switch
+ */
+func SwitchSensorHandler(client mqtt.Client, message mqtt.Message) {
+	sa, _ := RequestMap(message)
+	ld, _ := GetLocalSensor(sa.SensorID)
+	switch sa.Operation {
+	case count.SWITCH_CLOSE:
+		ld.Close()
+		break
+	case count.SWITCH_OPEN:
+		ld.Open()
+		break
+	default:
+	}
+}
+
 /*
  * 清除错误次数&&状态
  * @Topic sensor/action/clear
@@ -43,13 +61,13 @@ func ClearExceptionHandler(client mqtt.Client, message mqtt.Message) {
 	case count.CLEAR_ALL_EXCEPTION:
 		count.ClsAll()
 		for _, v := range GetLocalDevicesInstance().LocalSensorInformation {
-			v.Status = STATUS_NORMAL
+			v.Open()
 		}
 		break
 	case count.CLEAR_ONE_EXCEPTION:
 		count.ClsErrorCount(sa.SensorID)
 		ld, _ := GetLocalSensor(sa.SensorID)
-		ld.Status = STATUS_NORMAL
+		ld.Open()
 		break
 	default:
 	}
@@ -68,7 +86,7 @@ func ChangeAttachIPHandler(client mqtt.Client, message mqtt.Message) {
 }
 
 /*
- * 更改当前节点上的CONFIG文件
+ * 更改当前下位机上的CONFIG文件
  * Topic sensor/setting/all
  */
 func SettingConfigHandler(client mqtt.Client, message mqtt.Message) {
@@ -86,15 +104,19 @@ func SettingConfigHandler(client mqtt.Client, message mqtt.Message) {
 		fmt.Println("[FAIL] CONFIG保存时错误")
 		return
 	}
-	// fmt.Println("[INFO] CONFIG已更新")
 
+	jsonConfig.ReplaceLocalDeviceInstance()
+	RestartDeviceTCP()
+	// fmt.Println("[INFO] CONFIG已更新")
 }
 
 /**
- * 重启服务
+ * 重启服务 + 重新加载数据
  */
 func RestartHandler(client mqtt.Client, message mqtt.Message) {
-
+	fmt.Println("[INFO] 正在重启TCP")
+	ReloadDeviceInstance()
+	RestartTCPSystem()
 }
 
 /**

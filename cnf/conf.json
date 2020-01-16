@@ -1,1 +1,26 @@
-{"name":"示例收集器名","localSensorInformation":[{"addr":6,"type":0,"attach":"172.20.10.4","interval":10,"sensorID":"7eb220dd-6127-58c7-8663-bf2f55371b78"},{"addr":3,"type":0,"attach":"172.20.10.7","interval":5,"sensorID":"aec66d1a-c39a-5a9d-91bf-ad41154069fc"}]}
+{
+  "name": "示例收集器名",
+  "broker_ip": "106.13.79.157",
+  "broker_port": "1883",
+  "broker_scheme": "tcp",
+  "broker_username": "r3inb",
+  "broker_password": "159463",
+  # 可缺省
+  # "broker_client_id": "",
+  "localSensorInformation": [
+    {
+      "addr": 6,
+      "type": 0,
+      "attach": "172.20.10.4",
+      "interval": 10,
+      "sensorID": "7eb220dd-6127-58c7-8663-bf2f55371b78"
+    },
+    {
+      "addr": 3,
+      "type": 0,
+      "attach": "172.20.10.7",
+      "interval": 5,
+      "sensorID": "aec66d1a-c39a-5a9d-91bf-ad41154069fc"
+    }
+  ]
+}

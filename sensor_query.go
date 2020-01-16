@@ -105,6 +105,13 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 		return
 	}
 
+	// 关闭
+	ls, _ := GetLocalSensor(body.SensorID)
+	if ls.IsClosed() {
+		wg.Done()
+		return
+	}
+
 	//if value, err := GetLocalSensor(body.SensorID); err != nil {
 	//	fmt.Println("[FAIL] key not found ", err)
 	//} else if value.Status == STATUS_DETACH || value.Status == STATUS_CLOSED {
@@ -119,7 +126,7 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 		b, _ := GetDeviceSession(body.SensorAttachIP)
 		// 合成地址
 		body.CreateMeasureRequest()
-		fmt.Printf("[INFO] 测量请求 -> 传感器设备ID %s | 设备地址 %d | 任务类型 %d | 请求数据 %b |\n", body.SensorID, body.SensorAddr, body.Type, body.RequestData)
+		fmt.Printf("[INFO] 测量请求 ID:%s 设备地址:%d 任务类型:%d 请求数据:%b\n", body.SensorID, body.SensorAddr, body.Type, body.RequestData)
 		// 向传感器发送对应测量请求
 		p, err := b.MeasureRequest(body.RequestData, []string{"Oxygen", "Temp"})
 		if err != nil {
@@ -130,7 +137,7 @@ func DefaultSensorHandler(body TaskSensorBody, wg *sync.WaitGroup) {
 			if count.AddErrorOperation(body.SensorID) > 3 {
 				v.Status = STATUS_DETACH
 			}
-			fmt.Printf("[WARN] %s发生第%d次错误, 等待%s后重试\n", body.SensorID, count.GetErrorCount(body.SensorID), count.GetRetryTime(body.SensorID))
+			fmt.Printf("[WARN] 查询错误 ID:%s 发生第%d次错误 恢复时间: %s\n", body.SensorID, count.GetErrorCount(body.SensorID), count.GetRetryTime(body.SensorID).Format("2006/1/2 15:04:05"))
 			// v.Status = STATUS_DETACH
 			// waitGroup完成
 
@@ -232,6 +239,15 @@ func (ls *LocalSensorInformation) CreateTask(times int, queueChannel chan TaskSe
 func TaskSensorPush(data TaskData) {
 	body := data["Data"].(TaskSensorBody)
 	queueChannel := data["Channel"].(chan TaskSensorBody)
+	defer func() {
+		if recover() != nil {
+			fmt.Println("[INFO] 通道已关闭, 尝试再次关闭任务")
+			key := TaskSensorKey{body.SensorAddr, body.SensorAttachIP, body.Type}
+			if err := GetTimeWheel().RemoveTask(key); err != nil {
+				fmt.Println("[WARN] 尝试失败, 不存在的任务Key")
+			}
+		}
+	}()
 	queueChannel <- body
 }
 
@@ -242,39 +258,14 @@ func TaskSensorPush(data TaskData) {
  */
 func (ds *DeviceSession) TaskSensorPop(queueChannel chan TaskSensorBody) {
 	var wg sync.WaitGroup
-	//for {
-	//	v, ok := <-queueChannel
-	//	if !ok {
-	//		continue
-	//	} else {
-	//		// 确保数据有序进行
-	//		wg.Add(1)
-	//		DefaultSensorHandler(v, &wg)
-	//		// 等待上一个任务完成
-	//		wg.Wait()
-	//	}
-	//}
-	for {
-		select {
-		case v, ok := <-queueChannel:
-			if !ok {
-				fmt.Println("[INFO] POP已更新")
-				return
-			} else {
-				wg.Add(1)
-				DefaultSensorHandler(v, &wg)
-				wg.Wait()
-				break
-			}
-		}
-		//case stop := <-ds.stopChan:
-		//	if stop {
-		//		fmt.Println("[INFO] POP已更新")
-		//		return
-		//		clos
-		//	}
-		//}
+
+	for v := range queueChannel {
+		wg.Add(1)
+		DefaultSensorHandler(v, &wg)
+		wg.Wait()
 	}
+
+	fmt.Println("[INFO] POP成功关闭")
 }
 
 /**
@@ -329,8 +320,9 @@ func GetTimeWheel() *TimeWheel {
 
 /*
  * 定时任务设置
+ * @return ch 给processor进行回收
  */
-func TaskSetup(attachIP string) chan TaskSensorBody{
+func TaskSetup(attachIP string) chan TaskSensorBody {
 	ch := make(chan TaskSensorBody, 10)
 	// 这个pop每个dtu有且只有一个, 生命周期应与tcp挂钩
 	ds, _ := GetDeviceSession(attachIP)
@@ -339,11 +331,13 @@ func TaskSetup(attachIP string) chan TaskSensorBody{
 
 	// 为attach的每一个传感器设置定时任务
 	for _, v := range GetLocalDevicesInstance().GetLocalSensorList(attachIP) {
+		v.ScanSensorStatus()
 		if err := v.CreateTask(-1, ch); err != nil {
 			continue
 		}
-		fmt.Printf("[INFO] ID:%s 进入队列\n", v.SensorID)
+		fmt.Println("[INFO] 进入队列 ID:" + v.SensorID)
 	}
+
 	return ch
 }
 
@@ -351,29 +345,28 @@ func TaskSetup(attachIP string) chan TaskSensorBody{
  * 扫描attach(下位机)内传感器状态
  * 在processor内的for进行首次判断
  */
-func ScanSensorStatus(attach string) {
-	// 传感器列表
-	sensors := GetLocalDevicesInstance().GetLocalSensorList(attach)
-	// session
-	ds, _ := GetDeviceSession(attach)
-	for _, v := range sensors {
-		var sr []byte
-		// 设备ADDR
-		sr = append(sr, v.Addr)
-		// 指令功能码
-		sr = append(sr, InfoMK["ReadFunc"]...)
-		// 寄存器地址和数量
-		sr = append(sr, InfoMK["RAddr"]...)
-		// CRC_ModBus
-		sr = append(sr, CreateCRC(sr)...)
-		if _, err := ds.SendToSensor(sr); err != nil {
-			// 超时
-			v.Status = STATUS_DETACH
-		} else {
-			// TODO: 最后记得把fmt换成日志log输出
-			v.Status = STATUS_NORMAL
-			fmt.Println("[INFO] 设备连接成功" + v.SensorID + " FROM " + v.Attach)
-		}
+func (ls *LocalSensorInformation) ScanSensorStatus() {
+	fmt.Println("[INFO] 等待连接 ID:" + ls.SensorID + " FROM " + ls.Attach)
+	ds, _ := GetDeviceSession(ls.Attach)
+	var sr []byte
+	// 设备ADDR
+	sr = append(sr, ls.Addr)
+	// 指令功能码
+	sr = append(sr, InfoMK["ReadFunc"]...)
+	// 寄存器地址和数量
+	sr = append(sr, InfoMK["RAddr"]...)
+	// CRC_ModBus
+	sr = append(sr, CreateCRC(sr)...)
+	if _, err := ds.SendToSensor(sr); err != nil {
+		// 超时
+		ls.Status = STATUS_DETACH
+		count.AddErrorOperationBan(ls.SensorID)
+		fmt.Println("[WARN] 连接超时 ID:" + ls.SensorID + " FROM " + ls.Attach)
+	} else {
+		// TODO: 最后记得把fmt换成日志log输出
+		ls.Status = STATUS_NORMAL
+		count.ClsErrorCount(ls.SensorID)
+		fmt.Println("[INFO] 连接成功 ID:" + ls.SensorID + " FROM " + ls.Attach)
 	}
 }
 
@@ -388,4 +381,23 @@ func GetLocalSensor(sensorID string) (*LocalSensorInformation, error) {
 		}
 	}
 	return nil, errors.New("not find sensorID for this device")
+}
+
+func (ls *LocalSensorInformation) IsClosed() bool {
+	if ls.Status == STATUS_CLOSED {
+		return true
+	}
+	return false
+}
+
+func (ls *LocalSensorInformation) Open() {
+	ls.Status = STATUS_NORMAL
+}
+
+func (ls *LocalSensorInformation) Close() {
+	ls.Status = STATUS_CLOSED
+}
+
+func (ls *LocalSensorInformation) Detach() {
+	ls.Status = STATUS_DETACH
 }
