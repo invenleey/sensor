@@ -74,8 +74,7 @@ rabbitmq-plugins enable rabbitmq_mqtt
 }
 ```
 
-4. 启动程序
-
+4. 启动程序/docker compose
 
 #### 表格
 
