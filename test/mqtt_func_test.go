@@ -1,24 +1,25 @@
-package sensor
+package test
 
 import (
 	"encoding/json"
+	"sensor"
 	"testing"
 	"time"
 )
 
 func TestSettingConfigHandler(t *testing.T) {
-	MQTTMapping("sensor/setting/all", SettingConfigHandler)
+	sensor.MQTTMapping("sensor/setting/all", sensor.SettingConfigHandler)
 
-	i := SensorAction{
+	i := sensor.SensorAction{
 		SensorID:  "abcdefg",
 		Operation: "del",
 	}
 
-	v := GetLocalDevicesInstance()
+	v := sensor.GetLocalDevicesInstance()
 	i.Data, _ = json.Marshal(v)
 
 	j, _ := json.Marshal(i)
-	client, _ := GetMQTTInstance()
+	client, _ := sensor.GetMQTTInstance()
 	token := client.Publish("sensor/setting/all", 1, false, j)
 	token.Wait()
 
@@ -27,7 +28,7 @@ func TestSettingConfigHandler(t *testing.T) {
 }
 
 func TestRestartHandler(t *testing.T) {
-	client, _ := GetMQTTInstance()
+	client, _ := sensor.GetMQTTInstance()
 	client.Publish("sensor/action/bbbb", 1, false, 1)
 
 
