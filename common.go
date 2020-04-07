@@ -16,7 +16,12 @@ import (
 )
 
 /**
- * bigEndian transfer
+ * Common Utils
+ * @create 2020.04.06
+ */
+
+/**
+ * 大端输出 -> large -> small
  */
 func ToBigEndian(num uint16) []byte {
 	int16buf := new(bytes.Buffer)
@@ -27,7 +32,7 @@ func ToBigEndian(num uint16) []byte {
 }
 
 /**
- * littleEndian transfer
+ * 小端输出 -> small -> large
  */
 func ToLittleEndian(num uint16) []byte {
 	int16buf := new(bytes.Buffer)
@@ -141,16 +146,20 @@ func T() {
 
 }
 
-// ========================json-part-start===========================
+// ========================json-config-part===========================
 
-// 传感器可能出现的状态
+/**
+ * 传感器可能出现的状态
+ */
 const (
 	STATUS_NORMAL = iota // 正常运行的
 	STATUS_DETACH        // 异常断开的
 	STATUS_CLOSED        // 人为关闭的 备注: 该状态不写入CONFIG文件中, 因此该状态仅持续到下位机重启时刻
 )
 
-// 传感器参数 包含自定义任务和状态等信息
+/**
+ * 传感器参数 包含自定义任务和状态等信息
+ */
 type LocalSensorInformation struct {
 	// ==========OPTIONS============
 	TaskHandler func(body TaskSensorBody, wg *sync.WaitGroup) `json:"-"` // 自定义传感器任务
@@ -163,7 +172,9 @@ type LocalSensorInformation struct {
 	SensorID string `json:"sensorID"` // 传感器ID
 }
 
-// 下位机参数
+/**
+ * 下位机参数
+ */
 type LocalDeviceDetail struct {
 	Name           string  `json:"name"`             // 收集器名称
 	BrokerIP       string  `json:"broker_ip"`        // 中间件地址
@@ -201,6 +212,9 @@ func GetBrokerPort() string {
 	return GetLocalDevicesInstance().BrokerPort
 }
 
+/**
+ * broker协议
+ */
 func GetBrokerScheme() string {
 	return GetLocalDevicesInstance().BrokerScheme
 }
@@ -211,7 +225,7 @@ func GetConfigTest() *LocalDeviceDetail {
 	return config
 }
 
-// 本地传感器信息()
+// 本地传感器信息
 var localDeviceDetail *LocalDeviceDetail = nil
 
 /**
@@ -245,7 +259,9 @@ func (dl *LocalDeviceDetail) ReplaceLocalDeviceInstance() {
 
 const configFileSizeLimit = 10 << 20
 
-// Config加载
+/**
+ * Config加载
+ */
 func LoadConfig(path string) *LocalDeviceDetail {
 	var config LocalDeviceDetail
 	configFile, err := os.Open(path)
@@ -335,6 +351,9 @@ func ResultConfig(test []map[string]interface{}) (port_password []map[string]int
 
 // ========================json-part-end===========================
 
+/**
+ * IP判断
+ */
 func IsIp(ip string) (b bool) {
 	if m, _ := regexp.MatchString("^(25[0-5]|2[0-4]\\d|[0-1]\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]\\d{2}|[1-9]?\\d)$", ip); !m {
 		return false

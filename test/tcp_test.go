@@ -1,14 +1,15 @@
-package sensor
+package test
 
 import (
 	"fmt"
 	queue "github.com/fwhezfwhez/go-queue"
+	"sensor"
 	"testing"
 	"time"
 )
 
 func TestIoT(t *testing.T) {
-	RunDeviceTCP()
+	sensor.RunDeviceTCP()
 
 }
 

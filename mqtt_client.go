@@ -14,6 +14,7 @@ import (
 // var ClientID = bson.NewObjectId().String()
 // var Username = "r3inb"
 // var Password = "159463"
+// var base = "r3inbowari.top"
 
 var defaultPublishHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	// drop
@@ -21,9 +22,12 @@ var defaultPublishHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqt
 
 var client mqtt.Client = nil
 
+/**
+ * 获取MQ连接单例
+ */
 func GetMQTTInstance() (mqtt.Client, error) {
 	if client == nil || !client.IsConnectionOpen() {
-		if ins, err := pMQTTClient(); err != nil {
+		if ins, err := processMQTTClient(); err != nil {
 			return nil, err
 		} else {
 			client = ins
@@ -33,7 +37,10 @@ func GetMQTTInstance() (mqtt.Client, error) {
 	return client, nil
 }
 
-func pMQTTClient() (mqtt.Client, error) {
+/**
+ * 连接到MQTT处理
+ */
+func processMQTTClient() (mqtt.Client, error) {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(GetBrokerScheme() + "://" + GetBrokerIP() + ":" + GetBrokerPort())
 	// MQ ClientID
@@ -55,6 +62,9 @@ func pMQTTClient() (mqtt.Client, error) {
 	return c, nil
 }
 
+/**
+ * 订阅主题映射
+ */
 func MQTTMapping(topic string, callback mqtt.MessageHandler) bool {
 	if mq, err := GetMQTTInstance(); err != nil {
 		return false
@@ -68,6 +78,9 @@ func MQTTMapping(topic string, callback mqtt.MessageHandler) bool {
 	return true
 }
 
+/**
+ * 发布主题消息
+ */
 func MQTTPublish(topic string, payload interface{}) {
 	if mq, err := GetMQTTInstance(); err != nil {
 		fmt.Println("[FAIL] 发布失败")

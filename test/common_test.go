@@ -6,18 +6,27 @@ import (
 	"testing"
 )
 
+/**
+ * 高右低左
+ */
 func TestToLittleEndian(t *testing.T) {
 	dat := []byte{0x01, 0x02, 0x03, 0x04}
 	checksum := sensor.CheckSum(dat)
 	fmt.Printf("check sum:%X \n", sensor.ToLittleEndian(checksum))
 }
 
+/**
+ * 高左低右
+ */
 func TestToBigEndian(t *testing.T) {
 	dat := []byte{0x01, 0x02, 0x03, 0x04}
 	checksum := sensor.CheckSum(dat)
 	fmt.Printf("check sum:%X \n", sensor.ToBigEndian(checksum))
 }
 
+/*
+ * concat
+ */
 func TestComposeBody(t *testing.T) {
 	addr := []byte{0x06, 0x03}
 	funcdata := []byte{0x00, 0x00}
